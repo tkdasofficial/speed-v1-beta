@@ -19,7 +19,7 @@ export function authorizeUrl(p: Provider, clientId: string, redirect: string, st
     case "google":
       return `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({ ...base, response_type: "code", scope: "openid email profile", prompt: "select_account" })}`;
     case "github":
-      return `https://github.com/login/oauth/authorize?${new URLSearchParams({ ...base, scope: "read:user user:email" })}`;
+      return `https://github.com/login/oauth/authorize?${new URLSearchParams({ ...base, scope: "read:user user:email repo", allow_signup: "true" })}`;
     case "gitlab":
       return `https://gitlab.com/oauth/authorize?${new URLSearchParams({ ...base, response_type: "code", scope: "read_user" })}`;
     case "bitbucket":
@@ -27,7 +27,7 @@ export function authorizeUrl(p: Provider, clientId: string, redirect: string, st
   }
 }
 
-type Identity = { id: string; email: string; name?: string | undefined; avatar?: string | undefined };
+type Identity = { id: string; email: string; name?: string | undefined; avatar?: string | undefined; login?: string; tokens?: import("@security/github.server").GithubTokens };
 const form = (o: Record<string, string>) => new URLSearchParams(o);
 
 export async function fetchIdentity(p: Provider, code: string, redirect: string, cfg: { id: string; secret: string }): Promise<Identity> {
@@ -48,14 +48,20 @@ export async function fetchIdentity(p: Provider, code: string, redirect: string,
       method: "POST",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ client_id: cfg.id, client_secret: cfg.secret, code, redirect_uri: redirect }),
-    }).then((r) => r.json() as Promise<{ access_token?: string }>);
-    if (!t.access_token) throw new Error("GitHub sign-in failed");
+    }).then((r) => r.json() as Promise<{ access_token?: string; refresh_token?: string; expires_in?: number; refresh_token_expires_in?: number; scope?: string; error?: string }>)
+      .catch(() => { throw new Error("Could not reach GitHub, please try again"); });
+    if (!t.access_token) throw new Error(t.error === "bad_verification_code" ? "Sign-in expired, please try again" : "GitHub sign-in failed");
     const h = { Authorization: `Bearer ${t.access_token}`, "User-Agent": "speed-agent", Accept: "application/vnd.github+json" };
-    const u = await fetch("https://api.github.com/user", { headers: h }).then((r) => r.json() as Promise<{ id: number; name?: string; login: string; avatar_url?: string }>);
-    const emails = await fetch("https://api.github.com/user/emails", { headers: h }).then((r) => r.json() as Promise<{ email: string; primary: boolean; verified: boolean }[]>);
+    const ur = await fetch("https://api.github.com/user", { headers: h });
+    if (!ur.ok) throw new Error("Could not load your GitHub profile");
+    const u = (await ur.json()) as { id: number; name?: string; login: string; avatar_url?: string };
+    const er = await fetch("https://api.github.com/user/emails", { headers: h });
+    if (!er.ok) throw new Error("Could not load your GitHub email");
+    const emails = (await er.json()) as { email: string; primary: boolean; verified: boolean }[];
     const primary = emails.find((e) => e.primary && e.verified) ?? emails.find((e) => e.verified);
     if (!primary) throw new Error("GitHub account has no verified email");
-    return { id: String(u.id), email: primary.email.toLowerCase(), name: u.name ?? u.login, avatar: u.avatar_url };
+    return { id: String(u.id), email: primary.email.toLowerCase(), name: u.name ?? u.login, avatar: u.avatar_url, login: u.login,
+      tokens: { access_token: t.access_token, refresh_token: t.refresh_token, expires_in: t.expires_in, refresh_token_expires_in: t.refresh_token_expires_in, scope: t.scope } };
   }
   if (p === "gitlab") {
     const t = await fetch("https://gitlab.com/oauth/token", {

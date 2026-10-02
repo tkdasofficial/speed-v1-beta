@@ -121,3 +121,10 @@ export async function saveProfile(raw: unknown) {
   if (row) await publish(me.id, "profile", "upsert", me.id, row.version, { email: me.email, displayName: row.display_name, avatarUrl: row.avatar_url, version: row.version });
   return { ok: true as const };
 }
+
+/** GitHub connection state for the signed-in user (never returns tokens). */
+export async function getGithubConnection() {
+  const { requireUser } = await import("@security/authorize.server");
+  const { githubStatus } = await import("@security/github.server");
+  return githubStatus((await requireUser()).id);
+}
