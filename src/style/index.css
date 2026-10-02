@@ -23,7 +23,7 @@
 html, body, #root { min-height: 100%; }
 body { margin: 0; background: var(--background); color: var(--foreground); font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; font-size: 14px; font-weight: 400; }
 button, textarea, input { font: inherit; }
-button { color: inherit; cursor: pointer; }
+button { cursor: pointer; }
 button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 svg { width: 18px; height: 18px; stroke-width: 1.8; }
 

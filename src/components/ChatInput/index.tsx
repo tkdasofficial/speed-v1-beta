@@ -68,7 +68,7 @@ export function ChatInput({ onSend, busy, onStop, value, onChange, placeholder =
         {busy ? (
           <button type="button" onClick={onStop} aria-label="Stop agent" className="grid h-8 w-8 shrink-0 place-items-center rounded-[6px] border border-border text-foreground"><Square className="!h-3.5 !w-3.5" /></button>
         ) : (
-          <button type="button" onClick={send} disabled={!canSend} aria-label="Send" className={`grid h-8 w-8 shrink-0 place-items-center rounded-[6px] ${canSend ? "bg-cta text-black" : "bg-accent text-muted-foreground/50"}`}><ArrowUp className="!h-4 !w-4" /></button>
+          <button type="button" onClick={send} disabled={!canSend} aria-label="Send" className={`grid h-8 w-8 shrink-0 place-items-center rounded-[6px] ${canSend ? "bg-cta text-cta-foreground" : "bg-accent text-muted-foreground/50"}`}><ArrowUp className="!h-4 !w-4" /></button>
         )}
       </div>
     </div>
