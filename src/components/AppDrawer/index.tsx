@@ -10,15 +10,7 @@ function BrandMark() {
   return <div className="speed-sidebar__brand"><BrandLogo /><b>SPEED</b></div>;
 }
 
-const allProjects = [
-  { name: "hyper-copilot-sandbox", chat: false },
-  { name: "Clone hyper copilot sandbox", chat: true },
-  { name: "hyper-copilot-sandbox-1", chat: false },
-  { name: "elite-veo", chat: false },
-  { name: "Stellar Dashboard", chat: false },
-  { name: "Pulse Commerce", chat: false },
-  { name: "Nexus API", chat: false },
-];
+const allProjects: { name: string; chat: boolean }[] = [];
 const workspaces = ["Personal workspace", "Team workspace"];
 
 type SidebarPanelProps = {

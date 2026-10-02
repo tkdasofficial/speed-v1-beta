@@ -9,12 +9,12 @@ type Cat = "Development" | "Design" | "Storage" | "Database" | "Deployment" | "P
 type Status = "idle" | "connecting" | "connected" | "auth" | "error";
 type Integration = { id: string; name: string; desc: string; cat: Cat; icon: typeof Github; status: Status; verb: "Connect" | "Sign in" | "Enable" };
 const seed: Integration[] = [
-  { id: "github", name: "GitHub", desc: "Sync code, branches and pull requests", cat: "Development", icon: Github, status: "connected", verb: "Connect" },
+  { id: "github", name: "GitHub", desc: "Sync code, branches and pull requests", cat: "Development", icon: Github, status: "idle", verb: "Connect" },
   { id: "figma", name: "Figma", desc: "Import frames and design tokens", cat: "Design", icon: Figma, status: "idle", verb: "Connect" },
   { id: "gdrive", name: "Google Drive", desc: "Attach docs, sheets and assets", cat: "Storage", icon: HardDrive, status: "idle", verb: "Connect" },
-  { id: "google", name: "Google", desc: "Add Google sign-in to your apps", cat: "Development", icon: Globe, status: "auth", verb: "Sign in" },
+  { id: "google", name: "Google", desc: "Add Google sign-in to your apps", cat: "Development", icon: Globe, status: "idle", verb: "Sign in" },
   { id: "supabase", name: "Supabase", desc: "Postgres database, auth and storage", cat: "Database", icon: Database, status: "idle", verb: "Connect" },
-  { id: "firebase", name: "Firebase", desc: "Realtime database and hosting", cat: "Database", icon: Flame, status: "error", verb: "Connect" },
+  { id: "firebase", name: "Firebase", desc: "Realtime database and hosting", cat: "Database", icon: Flame, status: "idle", verb: "Connect" },
   { id: "vercel", name: "Vercel", desc: "Deploy previews and production builds", cat: "Deployment", icon: Triangle, status: "idle", verb: "Connect" },
   { id: "netlify", name: "Netlify", desc: "Static hosting and serverless functions", cat: "Deployment", icon: Cloud, status: "idle", verb: "Enable" },
   { id: "slack", name: "Slack", desc: "Send build and deploy notifications", cat: "Productivity", icon: MessageSquare, status: "idle", verb: "Sign in" },

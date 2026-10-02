@@ -10,7 +10,7 @@ import { ChatView } from "@/components/workspace/ChatView";
 import { PreviewView, SettingsView, TasksSheet } from "@/components/workspace/Panels";
 import { ProjectMenu } from "@/components/workspace/ProjectMenu";
 import { projectName as nameFor, projectSlug } from "@/lib/projects";
-import { seedChat, type ChatItem } from "@/lib/workspace-data";
+import type { ChatItem } from "@/lib/workspace-types";
 import "@/style/Workspace/index.css";
 
 
@@ -24,8 +24,7 @@ export function Workspace() {
 function WorkspaceInner({ projectId }: { projectId: string }) {
   const navigate = useNavigate();
   const [name, setName] = useState(nameFor(projectId));
-  // New/unknown projects start empty; known projects show a populated history.
-  const [items, setItems] = useState<ChatItem[]>(() => (nameFor(projectId) !== projectId ? seedChat() : []));
+  const [items, setItems] = useState<ChatItem[]>([]);
   const [mode, setMode] = useState<Mode>("chat");
   const [drawer, setDrawer] = useState(false);
   const [menu, setMenu] = useState(false);

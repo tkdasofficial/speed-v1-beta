@@ -16,14 +16,9 @@ const sources: { id: SourceId; name: string; desc: string; icon: typeof Github }
   { id: "figma", name: "Design Source", desc: "Import frames from a Figma file.", icon: Figma },
   { id: "files", name: "Existing Project / Files", desc: "Upload a ZIP or project folder.", icon: FolderUp },
 ];
-const repos = [
-  { name: "esports-playground", owner: "tkdasofficial", priv: false, updated: "2h ago" },
-  { name: "replit-ui", owner: "tkdasofficial", priv: false, updated: "1d ago" },
-  { name: "elite-veo", owner: "tkdasofficial", priv: true, updated: "3d ago" },
-  { name: "nexus-gateway", owner: "speed-labs", priv: true, updated: "1w ago" },
-  { name: "pulse-store", owner: "speed-labs", priv: false, updated: "2w ago" },
-];
-const figmaFiles = [{ name: "Speed Mobile Kit", owner: "Design team", priv: true, updated: "5h ago" }, { name: "Landing v3", owner: "Marketing", priv: false, updated: "4d ago" }];
+type RemoteItem = { name: string; owner: string; priv: boolean; updated: string };
+const repos: RemoteItem[] = [];
+const figmaFiles: RemoteItem[] = [];
 
 type Step = "sources" | "connecting" | "select" | "importing" | "success" | "error" | "cancelled";
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
