@@ -4,3 +4,4 @@
 - D1 is accessed only through the Worker's native `DB` binding (`cloudflare/functions/d1.ts`); allowed frontend origins come from the `ALLOWED_ORIGINS` Worker variable, never from code.
 - All email goes through `cloudflare/functions/email/send.server.ts` (Gmail SMTP); only the allowed types in templates.server.ts may be sent, never project-activity emails.
 - Worker secrets come only from the account Secrets Store (`cloudflare/secrets-store.ts`, bound as `secrets_store_secret`, resolved once per request); never plain Worker secrets or code.
+- Repository reads (`githubTree`/`githubFile`, GET /api/github/tree|file) resolve the repo only from `project_repos` for the signed-in owner and validate paths via `github/fs.ts`; clients never pass repo IDs, so no one can read an unlinked repo.
