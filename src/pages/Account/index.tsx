@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/PageShell";
+import "@/style/Account/index.css";
 
 
 export function AccountPage() {

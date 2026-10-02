@@ -2,7 +2,7 @@ import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Search, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Header, HeaderIcon } from "@/components/Header";
-import "@/style/app/index.css";
+import "@/style/PageShell/index.css";
 
 /** Shared mobile-first shell for Library / Integrations / Import. */
 export function PageShell({ title, sub, search, onSearch, actions, children }: {

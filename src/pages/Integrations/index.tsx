@@ -2,6 +2,7 @@ import { Cloud, Database, Figma, Flame, Github, HardDrive, MessageSquare, Triang
 import { useMemo, useState } from "react";
 import { PageShell, StateBox } from "@/components/PageShell";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import "@/style/Integrations/index.css";
 
 
 type Cat = "Development" | "Design" | "Storage" | "Database" | "Deployment" | "Productivity";

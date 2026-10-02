@@ -5,3 +5,4 @@
 - [x] Workspace panels (preview, tools, tasks, project settings)
 - [x] Settings & info redesign (settings, account, FAQ, privacy, terms)
 - [x] Remove duplicate page labels and status tags; enlarge auth branding icon
+- [x] Split app-page styles into owner-specific files and compact auth spacing

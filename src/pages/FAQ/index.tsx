@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, Search, MessageCircle } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
+import "@/style/FAQ/index.css";
 
 type Faq = { c: string; q: string; a: string };
 

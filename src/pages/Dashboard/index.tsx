@@ -45,7 +45,7 @@ import { useState } from "react";
 import { AppDrawer } from "@/components/AppDrawer";
 import { BrandLogo } from "@/components/BrandLogo";
 import { projectSlug } from "@/lib/projects";
-import "@/style/app/index.css";
+import "@/style/Dashboard/index.css";
 
 
 const recent = ["Hyper Copilot", "Stellar Dashboard", "Pulse Commerce", "Nexus API"];
