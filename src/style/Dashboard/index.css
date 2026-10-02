@@ -1,0 +1,14 @@
+.home-page { overflow-x: hidden; }
+.home-inner { position: relative; }
+.home-inner > :not(.ap-glow) { position: relative; z-index: 1; }
+.ap-glow-home { top: -180px; height: 520px; }
+.home-page h1 { font-weight: 800; line-height: 1.02; }
+.home-page .projects-head span { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
+.home-page .project-card { border-radius: 16px; background: linear-gradient(180deg, var(--card), var(--background)); transition: border-color .2s, transform .2s, box-shadow .2s; }
+.home-page .project-card:hover { border-color: color-mix(in oklab, var(--foreground) 22%, transparent); transform: translateY(-3px); box-shadow: 0 30px 70px -36px color-mix(in oklab, var(--primary) 75%, transparent); }
+.home-page .project-meta { padding: 12px 14px 14px; }
+.home-page .project-meta b { font-size: 14px; font-weight: 700; }
+.home-page .project-meta small { font-size: 12px; }
+.home-page .idea-list button { border-radius: 14px !important; background: linear-gradient(180deg, var(--card), var(--background)) !important; font-weight: 500; transition: border-color .2s, transform .2s; }
+.home-page .idea-list button:hover { border-color: color-mix(in oklab, var(--foreground) 22%, transparent) !important; transform: translateY(-2px); }
+.home-page .composer-wrap > * { border-radius: 18px; box-shadow: 0 30px 80px -30px color-mix(in oklab, var(--primary) 55%, transparent); }

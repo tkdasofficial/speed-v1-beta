@@ -1,0 +1,6 @@
+.sp-page .faq-item { border: 1px solid var(--border); border-radius: 16px; background: linear-gradient(180deg, var(--card), var(--background)); transition: border-color .2s; }
+.sp-page .faq-item[open], .sp-page .faq-item:hover { border-color: color-mix(in oklab, var(--foreground) 22%, transparent); }
+.sp-page .faq-search input, .sp-page .faq-search { border-radius: 12px; }
+.sp-page .faq-tabs button { border-radius: 999px; font-weight: 600; }
+.sp-page .faq-contact { border-radius: 20px; background: radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 60%), var(--card); border: 1px solid var(--border); }
+.sp-page .faq-contact-btn { border-radius: 10px; background: var(--cta); color: var(--cta-foreground); font-weight: 700; }
