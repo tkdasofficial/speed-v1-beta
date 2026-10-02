@@ -2,6 +2,7 @@ import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Search, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Header, HeaderIcon } from "@/components/Header";
+import "@/style/app/index.css";
 
 /** Shared mobile-first shell for Library / Integrations / Import. */
 export function PageShell({ title, sub, search, onSearch, actions, children }: {
@@ -25,8 +26,10 @@ export function PageShell({ title, sub, search, onSearch, actions, children }: {
         ) : undefined}
         right={<>{onSearch && !open && <HeaderIcon label="Search" onClick={() => setOpen(true)}><Search /></HeaderIcon>}{actions}</>}
       />
-      {sub && <p className="sp-sub" style={{ padding: "8px 12px 0" }}>{sub}</p>}
-      <div className="sp-body">{children}</div>
+      <div className="sp-body">
+        <div className="ap-hero"><div className="ap-glow" aria-hidden="true" /><h1>{title}</h1>{sub && <p>{sub}</p>}</div>
+        {children}
+      </div>
     </main>
   );
 }
