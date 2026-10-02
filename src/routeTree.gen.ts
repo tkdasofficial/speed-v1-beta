@@ -28,9 +28,6 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-passw
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
 import { Route as AuthenticatedProjectProjectIdRouteImport } from './routes/_authenticated/project.$projectId'
-import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
-import { Route as ApiPublicAuthCallbackProviderRouteImport } from './routes/api/public/auth/callback.$provider'
-import { Route as ApiPublicAuthStartProviderRouteImport } from './routes/api/public/auth/start.$provider'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -129,23 +126,6 @@ const AuthenticatedProjectProjectIdRoute =
     path: '/project/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe/webhook',
-  path: '/api/public/stripe/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAuthCallbackProviderRoute =
-  ApiPublicAuthCallbackProviderRouteImport.update({
-    id: '/api/public/auth/callback/$provider',
-    path: '/api/public/auth/callback/$provider',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicAuthStartProviderRoute =
-  ApiPublicAuthStartProviderRouteImport.update({
-    id: '/api/public/auth/start/$provider',
-    path: '/api/public/auth/start/$provider',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -166,9 +146,6 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
-  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -189,9 +166,6 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
-  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -214,9 +188,6 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
-  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -239,9 +210,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/verify-email'
     | '/project/$projectId'
-    | '/api/public/stripe/webhook'
-    | '/api/public/auth/callback/$provider'
-    | '/api/public/auth/start/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -262,9 +230,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/verify-email'
     | '/project/$projectId'
-    | '/api/public/stripe/webhook'
-    | '/api/public/auth/callback/$provider'
-    | '/api/public/auth/start/$provider'
   id:
     | '__root__'
     | '/'
@@ -286,9 +251,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/verify-email'
     | '/_authenticated/project/$projectId'
-    | '/api/public/stripe/webhook'
-    | '/api/public/auth/callback/$provider'
-    | '/api/public/auth/start/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -302,9 +264,6 @@ export interface RootRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
-  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
-  ApiPublicAuthCallbackProviderRoute: typeof ApiPublicAuthCallbackProviderRoute
-  ApiPublicAuthStartProviderRoute: typeof ApiPublicAuthStartProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -442,27 +401,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/stripe/webhook': {
-      id: '/api/public/stripe/webhook'
-      path: '/api/public/stripe/webhook'
-      fullPath: '/api/public/stripe/webhook'
-      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/auth/callback/$provider': {
-      id: '/api/public/auth/callback/$provider'
-      path: '/api/public/auth/callback/$provider'
-      fullPath: '/api/public/auth/callback/$provider'
-      preLoaderRoute: typeof ApiPublicAuthCallbackProviderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/auth/start/$provider': {
-      id: '/api/public/auth/start/$provider'
-      path: '/api/public/auth/start/$provider'
-      fullPath: '/api/public/auth/start/$provider'
-      preLoaderRoute: typeof ApiPublicAuthStartProviderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -504,9 +442,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   AuthVerifyEmailRoute: AuthVerifyEmailRoute,
-  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
-  ApiPublicAuthCallbackProviderRoute: ApiPublicAuthCallbackProviderRoute,
-  ApiPublicAuthStartProviderRoute: ApiPublicAuthStartProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
