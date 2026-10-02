@@ -23,7 +23,7 @@ async function open(v: string) {
   return new TextDecoder().decode(pt);
 }
 
-export type GithubTokens = { access_token: string; refresh_token?: string; expires_in?: number; refresh_token_expires_in?: number; scope?: string };
+export type GithubTokens = { access_token: string; refresh_token?: string | undefined; expires_in?: number | undefined; refresh_token_expires_in?: number | undefined; scope?: string | undefined };
 const now = () => Math.floor(Date.now() / 1000);
 
 export async function saveGithubTokens(userId: string, githubUserId: string, login: string, t: GithubTokens) {
