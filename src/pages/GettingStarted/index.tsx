@@ -1,3 +1,4 @@
+import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
@@ -26,8 +27,7 @@ export function GettingStartedPage() {
     setTimeout(() => navigate({ to: "/dashboard" }), 600);
   };
 
-  return <main className="auth-page">
-    <div className="auth-card">
+  return <AuthShell>
       <AuthHeader title="Getting started" sub="Tell us a little about yourself." />
       <form onSubmit={submit} className="auth-form" noValidate>
         <label>Full name<input className="sp-input" autoComplete="name" maxLength={100} value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} /></label>
@@ -50,6 +50,5 @@ export function GettingStartedPage() {
         {error && <p className="sp-err" role="alert">{error}</p>}
         <Button type="submit" className="auth-full" disabled={busy}>{busy ? "Continuing…" : "Continue"}</Button>
       </form>
-    </div>
-  </main>;
+    </AuthShell>;
 }

@@ -1,3 +1,4 @@
+import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
@@ -32,8 +33,7 @@ export function LoginPage() {
   };
 
   return (
-    <main className="auth-page">
-      <div className="auth-card">
+    <AuthShell>
         <AuthHeader title="Log in" sub="Welcome back to Speed." />
         <SocialButtons disabled={busy} onPick={() => { setBusy(true); setTimeout(() => navigate({ to: "/dashboard" }), 600); }} />
         <form onSubmit={submit} className="auth-form" noValidate>
@@ -47,7 +47,6 @@ export function LoginPage() {
         </form>
         <p className="auth-hint">Demo: {MOCK_USER.email} / {MOCK_USER.password}</p>
         <p className="auth-foot">New to Speed? <Link to="/auth/signup">Create account</Link></p>
-      </div>
-    </main>
+      </AuthShell>
   );
 }

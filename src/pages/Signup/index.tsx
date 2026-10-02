@@ -1,3 +1,4 @@
+import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
@@ -34,8 +35,7 @@ export function SignupPage() {
   };
 
   return (
-    <main className="auth-page">
-      <div className="auth-card">
+    <AuthShell>
         <AuthHeader title="Create account" sub="Start building apps with Speed." />
         <SocialButtons disabled={busy} onPick={() => { setError(""); if (agreed()) finish(); }} />
         <form onSubmit={submit} className="auth-form" noValidate>
@@ -49,7 +49,6 @@ export function SignupPage() {
           <Button type="submit" className="auth-full" disabled={busy}>{busy ? "Creating…" : "Create account"}</Button>
         </form>
         <p className="auth-foot">Have an account? <Link to="/auth/login">Log in</Link></p>
-      </div>
-    </main>
+      </AuthShell>
   );
 }
