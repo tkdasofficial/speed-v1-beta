@@ -38,6 +38,12 @@ export async function pushSecrets(storeId: string) {
   return pushed;
 }
 
+/** Names of every Speed secret currently held in the store. */
+export async function listStored(storeId: string) {
+  const existing = await call<{ name: string }[]>(`${API}/${storeId}/secrets?per_page=100`);
+  return STORE_SECRETS.filter((n) => existing.some((s) => s.name === n));
+}
+
 if (import.meta.main) {
   const id = await ensureStore();
   console.log(`Store ${id}: stored ${(await pushSecrets(id)).join(", ")}`);

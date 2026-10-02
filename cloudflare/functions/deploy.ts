@@ -6,13 +6,20 @@
 //   ALLOWED_ORIGINS  comma-separated frontend origins, `*` wildcards allowed (required)
 //   GOOGLE_/GITHUB_CLIENT_ID/_SECRET, STRIPE_WEBHOOK_SECRET                   (optional)
 const env = process.env;
-const need = ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_D1_DATABASE_ID", "SMTP_EMAIL", "SMTP_PASSWORD", "REALTIME_SECRET", "REALTIME_URL", "ALLOWED_ORIGINS"];
+const need = ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_D1_DATABASE_ID"];
 const missing = need.filter((k) => !env[k]);
 if (missing.length) throw new Error(`Missing: ${missing.join(", ")}`);
 
 const NAME = "speed-api";
 const API = `https://api.cloudflare.com/client/v4/accounts/${env["CLOUDFLARE_ACCOUNT_ID"]}/workers`;
 const auth = { Authorization: `Bearer ${env["CLOUDFLARE_API_TOKEN"]}` };
+
+// Plain settings fall back to the values already on the live Worker.
+if (!env["REALTIME_URL"] || !env["ALLOWED_ORIGINS"]) {
+  const s = (await (await fetch(`${API}/scripts/${NAME}/settings`, { headers: auth })).json()) as { result?: { bindings?: { name: string; text?: string }[] } };
+  for (const b of s.result?.bindings ?? []) if ((b.name === "REALTIME_URL" || b.name === "ALLOWED_ORIGINS") && !env[b.name] && b.text) env[b.name] = b.text;
+}
+for (const k of ["REALTIME_URL", "ALLOWED_ORIGINS"]) if (!env[k]) throw new Error(`Missing: ${k}`);
 
 const built = await Bun.build({
   entrypoints: [`${import.meta.dir}/index.ts`],
@@ -25,9 +32,10 @@ if (!built.success) throw new Error(`Build failed: ${built.logs.join("\n")}`);
 const code = await built.outputs[0]!.text();
 
 // Secrets come only from the Cloudflare Secrets Store (pushed first, then bound by name).
-const { ensureStore, pushSecrets } = await import("../secrets-store");
+const { ensureStore, pushSecrets, listStored } = await import("../secrets-store");
 const storeId = await ensureStore();
-const stored = await pushSecrets(storeId);
+await pushSecrets(storeId);
+const stored = await listStored(storeId);
 const metadata = {
   main_module: "index.js",
   compatibility_date: "2025-09-01",
