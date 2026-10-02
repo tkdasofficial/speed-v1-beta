@@ -1,6 +1,6 @@
 {
-  "exclude": ["real-time/worker/**", "backend/deploy.ts"],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "security/**/*.ts", "real-time/**/*.ts", "shell/**/*.ts", "backend/**/*.ts", "vite.config.ts", "eslint.config.js"],
+  "exclude": ["cloudflare/real-time/worker/**", "cloudflare/functions/deploy.ts", "cloudflare/secrets-store.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "cloudflare/security/**/*.ts", "cloudflare/real-time/**/*.ts", "shell/**/*.ts", "cloudflare/functions/**/*.ts", "vite.config.ts", "eslint.config.js"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -26,10 +26,10 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@security/*": ["./security/*"],
-      "@realtime/*": ["./real-time/*"],
+      "@security/*": ["./cloudflare/security/*"],
+      "@realtime/*": ["./cloudflare/real-time/*"],
       "@shell/*": ["./shell/*"],
-      "@backend/*": ["./backend/*"]
+      "@backend/*": ["./cloudflare/functions/*"]
     }
   }
 }

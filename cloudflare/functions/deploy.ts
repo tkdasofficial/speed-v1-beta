@@ -19,7 +19,7 @@ const built = await Bun.build({
   target: "browser",
   format: "esm",
   external: ["node:*", "cloudflare:*"],
-  tsconfig: `${import.meta.dir}/../tsconfig.json`,
+  tsconfig: `${import.meta.dir}/../../tsconfig.json`,
 } as Parameters<typeof Bun.build>[0]);
 if (!built.success) throw new Error(`Build failed: ${built.logs.join("\n")}`);
 const code = await built.outputs[0]!.text();

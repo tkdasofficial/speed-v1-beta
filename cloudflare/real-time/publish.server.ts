@@ -1,4 +1,4 @@
-import { envStr } from "../backend/context";
+import { envStr } from "../functions/context";
 // Records an authoritative change in change_log, then pushes it to the user's
 // relay hub. If the push fails, clients recover the event via changesSince().
 import { d1 } from "@backend/d1";

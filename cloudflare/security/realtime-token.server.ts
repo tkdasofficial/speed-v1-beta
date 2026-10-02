@@ -1,4 +1,4 @@
-import { envStr } from "../backend/context";
+import { envStr } from "../functions/context";
 // Mints short-lived tokens that let one authenticated user join only their own
 // real-time channel. Verified by the relay with the shared REALTIME_SECRET.
 const enc = new TextEncoder();
