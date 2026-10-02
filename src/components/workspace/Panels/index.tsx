@@ -1,6 +1,7 @@
 import { AlertTriangle, Check, ChevronLeft, FileText, Folder, Github, Globe, Loader2, Lock, Smartphone, X } from "lucide-react";
 import { oauthStartUrl } from "@/lib/api";
 import { getGithubConnection } from "@/lib/api/auth";
+import { getProjectFile, listProjectFiles } from "@/lib/api/imports";
 import { getProjectRepo, githubFile, githubRepos, githubTree, linkProjectRepo, unlinkProjectRepo, verifyProjectRepo } from "@/lib/api/github";
 import { useEffect, useState } from "react";
 import type { Task } from "@/lib/workspace-types";
@@ -47,6 +48,7 @@ export function SettingsView({ projectId, name, setName, settings, onSettings }:
           <label className="grid gap-1 text-[12px] text-muted-foreground">Name<input value={draftName} onChange={(e) => setDraftName(e.target.value)} onBlur={() => { if (draftName.trim() && draftName !== name) setName(draftName); }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} className="h-10 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] text-foreground outline-none focus:border-primary" /></label>
           <Seg label="Visibility" value={vis} options={["Private", "Public"]} onChange={setVis} />
         </Section>
+        {projectId && settings["importStatus"] === "ready" && <Section title="Imported files"><ImportedFiles projectId={projectId} settings={settings} /></Section>}
         {projectId && <Section title="GitHub repository"><RepoPicker projectId={projectId} /></Section>}
         <Section title="Model">
           <Seg label="Default model" value={model} options={["Free", "Balanced", "Power"]} onChange={setModel} />
@@ -280,3 +282,64 @@ function RepoBrowser({ projectId }: { projectId: string }) {
   );
 }
 
+
+type IFile = Awaited<ReturnType<typeof listProjectFiles>>[number];
+type IOpen = Awaited<ReturnType<typeof getProjectFile>>;
+const SOURCE_LABEL: Record<string, string> = { github: "GitHub", gitlab: "GitLab", bitbucket: "Bitbucket", zip: "ZIP upload", directory: "Local folder" };
+
+/** Files saved by an import, read back from the backend. */
+function ImportedFiles({ projectId, settings }: { projectId: string; settings: Record<string, unknown> }) {
+  const [files, setFiles] = useState<IFile[] | null>(null);
+  const [dir, setDir] = useState("");
+  const [file, setFile] = useState<IOpen | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const fail = (e: unknown) => setErr(e instanceof Error ? e.message : "Something went wrong");
+  const src = String(settings["source"] ?? "");
+  const repo = typeof settings["sourceRepo"] === "string" ? ` · ${settings["sourceRepo"] as string}${settings["sourceBranch"] && settings["sourceBranch"] !== "HEAD" ? ` @ ${settings["sourceBranch"] as string}` : ""}` : "";
+  const header = <p className="m-0 text-[13px] text-muted-foreground">From {SOURCE_LABEL[src] ?? src}{repo} · {String(settings["importedFiles"] ?? 0)} files</p>;
+  const load = async () => { setBusy("list"); setErr(null); try { setFiles(await listProjectFiles({ data: { projectId } })); } catch (e) { fail(e); } setBusy(null); };
+  const open = async (path: string) => { setBusy(path); setErr(null); try { setFile(await getProjectFile({ data: { projectId, path } })); } catch (e) { fail(e); } setBusy(null); };
+
+  if (!files) return (
+    <div className="grid gap-2">{header}
+      <button type="button" onClick={() => void load()} disabled={!!busy} className="h-9 justify-self-start rounded-[11px] border border-border px-3 text-[13px] font-medium">{busy ? "Loading files…" : "Browse files"}</button>
+      {err && <p className="m-0 flex items-center gap-1.5 text-[13px] text-destructive"><AlertTriangle className="!h-4 !w-4" />{err}</p>}
+    </div>
+  );
+  if (file) return (
+    <div className={`${card} grid gap-2 p-2`}>
+      <div className="flex items-center gap-2 px-1 text-[13px]">
+        <button type="button" onClick={() => setFile(null)} className="flex h-8 items-center gap-1 rounded-[10px] border border-border px-2 font-medium"><ChevronLeft className="!h-4 !w-4" />Files</button>
+        <span className="min-w-0 flex-1 truncate font-semibold">{file.path}</span>
+        <span className="shrink-0 text-[12px] text-muted-foreground">{file.size.toLocaleString()} B</span>
+      </div>
+      {file.kind === "text"
+        ? <pre className="m-0 max-h-[60vh] overflow-auto rounded-[10px] border border-border bg-background p-3 text-[12px] leading-5"><code>{file.content}</code></pre>
+        : <p className="m-0 p-3 text-center text-[13px] text-muted-foreground">{file.kind === "binary" ? "This is a binary file and can't be shown as text." : "This file was too large to store; only its name was imported."}</p>}
+    </div>
+  );
+  const prefix = dir ? `${dir}/` : "";
+  const under = files.filter((f) => f.path.startsWith(prefix));
+  const subdirs = [...new Set(under.map((f) => f.path.slice(prefix.length)).filter((r) => r.includes("/")).map((r) => r.split("/")[0]!))].sort();
+  const here = under.filter((f) => !f.path.slice(prefix.length).includes("/"));
+  const up = dir.includes("/") ? dir.slice(0, dir.lastIndexOf("/")) : "";
+  return (
+    <div className={`${card} grid gap-1 p-2`}>
+      <div className="flex items-center gap-2 px-1 text-[13px]">
+        {dir && <button type="button" onClick={() => setDir(up)} aria-label="Up one folder" className="grid h-8 w-8 place-items-center rounded-[10px] border border-border"><ChevronLeft className="!h-4 !w-4" /></button>}
+        <span className="min-w-0 flex-1 truncate font-semibold">{dir || "Project root"}</span>
+      </div>
+      {err && <p className="m-0 flex items-center gap-1.5 px-1 text-[13px] text-destructive"><AlertTriangle className="!h-4 !w-4" />{err}</p>}
+      <div className="grid max-h-80 gap-0.5 overflow-y-auto">
+        {subdirs.map((d) => <button key={d} type="button" onClick={() => setDir(prefix + d)} className="flex items-center gap-2 rounded-[10px] px-2 py-2 text-left hover:bg-accent"><Folder className="!h-4 !w-4 shrink-0 text-primary" /><span className="min-w-0 flex-1 truncate text-[14px]">{d}</span></button>)}
+        {here.map((f) => (
+          <button key={f.path} type="button" disabled={!!busy} onClick={() => void open(f.path)} className="flex items-center gap-2 rounded-[10px] px-2 py-2 text-left hover:bg-accent">
+            <FileText className="!h-4 !w-4 shrink-0 text-muted-foreground" /><span className="min-w-0 flex-1 truncate text-[14px]">{f.name}</span>
+            {busy === f.path ? <Loader2 className="!h-3.5 !w-3.5 animate-spin" /> : <span className="text-[11px] text-muted-foreground">{f.size.toLocaleString()} B</span>}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
