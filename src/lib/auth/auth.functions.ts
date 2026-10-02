@@ -125,6 +125,15 @@ export const resetPassword = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+export const signOut = createServerFn({ method: "POST" }).handler(async () => {
+  const { getCookie, deleteCookie } = await import("@tanstack/react-start/server");
+  const { deleteSession, SESSION_COOKIE } = await import("@security/session.server");
+  const t = getCookie(SESSION_COOKIE);
+  if (t) await deleteSession(t);
+  deleteCookie(SESSION_COOKIE, { path: "/" });
+  return { ok: true };
+});
+
 export const getMe = createServerFn({ method: "GET" }).handler(async () => {
   const { currentUser } = await import("@security/authorize.server");
   return currentUser();

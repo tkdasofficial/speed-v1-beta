@@ -1,7 +1,7 @@
 // Email templates for the allowed notification types only. Server-only.
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-type Block = { heading: string; intro: string; code?: string; button?: { label: string; url: string }; lines?: string[]; foot?: string };
+type Block = { heading: string; intro: string; code?: string; button?: { label: string; url: string }; lines?: string[] | undefined; foot?: string };
 
 function layout(b: Block) {
   const lines = (b.lines ?? []).map((l) => `<p style="margin:0 0 6px;color:#1A1A1A;font-size:14px">${esc(l)}</p>`).join("");

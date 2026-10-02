@@ -26,4 +26,5 @@ export async function notifyBilling(ev: Ev, userId: string | null) {
     const status = ev.type.endsWith("deleted") ? "canceled" : String(o["status"] ?? "updated");
     return sendEmail("billing", to, { title: "Subscription updated", body: `Your Speed subscription is now ${status}.` }, key);
   }
+  return undefined;
 }
