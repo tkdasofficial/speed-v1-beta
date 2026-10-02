@@ -9,7 +9,10 @@ import { Categories } from "@/components/workspace/Categories";
 import { ChatView } from "@/components/workspace/ChatView";
 import { PreviewView, SettingsView, TasksSheet } from "@/components/workspace/Panels";
 import { ProjectMenu } from "@/components/workspace/ProjectMenu";
-import { projectName as nameFor, projectSlug } from "@/lib/projects";
+import { projectSlug } from "@/lib/projects";
+import { useServerFn } from "@tanstack/react-start";
+import { useMessages, useProjects } from "@/lib/sync";
+import { sendMessage, updateProject } from "@/lib/sync/sync.functions";
 import type { ChatItem } from "@/lib/workspace-types";
 import "@/style/Workspace/index.css";
 
@@ -23,8 +26,17 @@ export function Workspace() {
 
 function WorkspaceInner({ projectId }: { projectId: string }) {
   const navigate = useNavigate();
-  const [name, setName] = useState(nameFor(projectId));
-  const [items, setItems] = useState<ChatItem[]>([]);
+  const projects = useProjects();
+  const project = projects?.find((p) => p.slug === projectId);
+  const name = project?.name ?? (projects ? "Project not found" : "");
+  const rename = useServerFn(updateProject);
+  const setName = (n: string) => { if (project && n.trim()) void rename({ data: { id: project.id, name: n.trim() } }); };
+  const messages = useMessages(project?.id);
+  const items: ChatItem[] = messages.map((m) => (m.role === "user"
+    ? { id: m.id, type: "user", text: m.content, time: new Date(`${m.createdAt.replace(" ", "T")}Z`).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }
+    : { id: m.id, type: "ai", text: m.content }));
+  const send = useServerFn(sendMessage);
+  const onSend = (text: string) => { if (project) void send({ data: { projectId: project.id, content: text } }); };
   const [mode, setMode] = useState<Mode>("chat");
   const [drawer, setDrawer] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -51,9 +63,9 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
       />
 
       <main className="flex min-h-0 flex-1 flex-col">
-        {mode === "chat" && <ChatView items={items} setItems={setItems} />}
+        {mode === "chat" && <ChatView items={items} onSend={onSend} />}
          {mode === "preview" && <PreviewView hasPreview={hasPreview} projectName={name} path={previewPath} reloadKey={previewReload} onBack={() => setMode("chat")} />}
-        {mode === "settings" && <SettingsView name={name} setName={setName} />}
+        {mode === "settings" && <SettingsView name={name} setName={setName} settings={project?.settings ?? {}} onSettings={(s) => { if (project) void rename({ data: { id: project.id, settings: s } }); }} />}
       </main>
 
        <footer className={`grid shrink-0 gap-2 px-3 pb-[max(8px,env(safe-area-inset-bottom))] pt-1 ${mode === "preview" ? "grid-cols-[minmax(0,1fr)_40px_40px]" : "grid-cols-[40px_minmax(0,1fr)_40px]"}`}>
@@ -78,7 +90,7 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
 
        {menu && <ProjectMenu name={name} setName={setName} onClose={() => setMenu(false)} onSettings={() => { setMenu(false); setMode("settings"); }} />}
        {tools && <Categories onClose={() => setTools(false)} />}
-      {tasks && <TasksSheet onClose={() => setTasks(false)} />}
+      {tasks && <TasksSheet projectId={project?.id} onClose={() => setTasks(false)} />}
       </div>
     </div>
   );

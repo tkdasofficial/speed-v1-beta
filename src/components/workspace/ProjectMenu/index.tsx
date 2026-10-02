@@ -1,13 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Check, Download, FolderOpen, Lock, MoreHorizontal, Pencil, Plug, Plus, Repeat, Settings, Shield, X } from "lucide-react";
 import { useState } from "react";
-import { projectSlug } from "@/lib/projects";
+import { useProjects } from "@/lib/sync";
 import { Button } from "@/components/ui/button";
 
-const recent: string[] = [];
 
 export function ProjectMenu({ name, setName, onClose, onSettings }: { name: string; setName: (n: string) => void; onClose: () => void; onSettings: () => void }) {
   const navigate = useNavigate();
+  const recent = (useProjects() ?? []).slice(0, 6);
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(name);
   const go = (to: "/dashboard" | "/import" | "/library" | "/integrations") => { onClose(); void navigate({ to }); };
@@ -51,9 +51,9 @@ export function ProjectMenu({ name, setName, onClose, onSettings }: { name: stri
         </div>
         <div className="my-1 h-px bg-border" />
         <h4 className="m-0 px-2 py-1.5 text-[11px] font-bold uppercase text-muted-foreground">Recent projects</h4>
-        {recent.map((p) => (
-          <div key={p} className="flex h-10 items-center gap-2 rounded-[6px] px-2 hover:bg-accent">
-            <button type="button" onClick={() => { onClose(); void navigate({ to: "/project/$projectId", params: { projectId: projectSlug(p) } }); }} className="flex min-w-0 flex-1 items-center gap-2.5 text-left text-[14px]">
+        {recent.map(({ name: p, slug }) => (
+          <div key={slug} className="flex h-10 items-center gap-2 rounded-[6px] px-2 hover:bg-accent">
+            <button type="button" onClick={() => { onClose(); void navigate({ to: "/project/$projectId", params: { projectId: slug } }); }} className="flex min-w-0 flex-1 items-center gap-2.5 text-left text-[14px]">
               <span className="grid h-6 w-6 shrink-0 place-items-center rounded-[5px] border border-border text-[11px] font-bold">{p[0]}</span>
               <span className="truncate">{p}</span><Lock className="!h-3 !w-3 shrink-0 text-muted-foreground" />
             </button>
