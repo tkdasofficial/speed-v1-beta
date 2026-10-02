@@ -42,8 +42,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { AppDrawer } from "@/components/AppDrawer";
-import { BrandLogo } from "@/components/BrandLogo";
+import { AppDrawer, DesktopSidebar } from "@/components/AppDrawer";
 import { projectSlug } from "@/lib/projects";
 import "@/style/Dashboard/index.css";
 
@@ -55,15 +54,6 @@ const dashboardProjects = [
   { name: "Pulse Commerce", kind: "Storefront", preview: "store" },
   { name: "Nexus API", kind: "Developer tools", preview: "developer" },
 ] as const;
-
-function BrandMark() {
-  return (
-    <div className="brand-mark">
-      <BrandLogo />
-      <b>SPEED</b>
-    </div>
-  );
-}
 
 function ProjectPreview({ type }: { type: (typeof dashboardProjects)[number]["preview"] }) {
   return <span className={`project-thumb preview-${type}`} aria-hidden="true">
@@ -97,22 +87,7 @@ export function EvoAgent() {
 
   return (
     <div className="app-shell">
-      <aside className="desktop-sidebar">
-        <div className="sidebar-brand"><BrandMark /><button className="icon-button" aria-label="Collapse sidebar"><PanelLeft /></button></div>
-        <button className="new-project"><Plus /> New project</button>
-        <nav className="side-nav" aria-label="Main navigation">
-          <button className="active"><Sparkles /> Agent</button>
-          <button><FolderGit2 /> Projects</button>
-          <button><Library /> Templates</button>
-          <button><Clock3 /> Activity</button>
-          <button><Boxes /> Integrations</button>
-        </nav>
-        <p className="nav-label">Recent</p>
-        <div className="recent-list">
-          {recent.map((name, index) => <button key={name}><span className={`project-dot dot-${index}`} />{name}<MoreHorizontal /></button>)}
-        </div>
-        <div className="sidebar-footer"><button><CircleHelp /> Help</button><button><Settings /> Settings</button><div className="profile"><span>TK</span><div><b>TK Das</b><small>Personal workspace</small></div><MoreHorizontal /></div></div>
-      </aside>
+      <DesktopSidebar onNew={() => { setPrompt(""); setRunning(false); }} onOpenProject={openProject} />
 
       <div className="main-frame">
 

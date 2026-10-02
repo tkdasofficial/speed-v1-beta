@@ -13,7 +13,7 @@
 - Use a mobile-first, Replit-inspired workspace shell with the locked palette only (#000, #FFF, #1A1A1A, blue #1D4ED8, red #FF3B3B); this is the brief's non-negotiable visual system.
 - Use Manrope throughout, with 400 for body copy, 500 for controls, 600 for headings, and 700–800 for labels and emphasis; this preserves hierarchy with one font family.
 - Keep workspace-wide navigation and fixed controls in reusable global components, while page content remains view-specific; this prevents header duplication and overlap regressions.
-- AppDrawer is the single sidebar implementation for dashboard and workspace, with a persistent desktop panel and mobile overlay; this keeps navigation behavior consistent.
+- AppDrawer owns both the persistent desktop sidebar and mobile overlay, with styles isolated in its module stylesheet; this keeps navigation content, behavior, and quality consistent.
 - Projects open at /project/$projectId (slug of project name); dashboard contains no workspace UI; /workspace redirects to a default project.
 - Workspace navigation uses a bottom Tools / Preview / Tasks bar, while Settings opens from the project menu; this preserves immediate access to the Agent conversation without top tabs.
 - Preview controls reuse the workspace bottom bar and keep preview state in the workspace route; this avoids a duplicate header and preserves chat navigation.
