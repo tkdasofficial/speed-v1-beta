@@ -1,3 +1,4 @@
+import { envStr } from "../context";
 // Minimal SMTP client (implicit TLS, port 465) over node:tls. Server-only.
 // Credentials come from SMTP_EMAIL / SMTP_PASSWORD and are never logged.
 import { connect } from "node:tls";
@@ -12,8 +13,8 @@ function wrap76(s: string) {
 }
 
 export async function smtpSend(mail: Mail) {
-  const user = process.env["SMTP_EMAIL"];
-  const pass = process.env["SMTP_PASSWORD"];
+  const user = envStr("SMTP_EMAIL");
+  const pass = envStr("SMTP_PASSWORD");
   if (!user || !pass) throw new Error("Email is not configured");
   if (/[\r\n]/.test(mail.to) || /[\r\n]/.test(mail.subject)) throw new Error("Invalid header");
 

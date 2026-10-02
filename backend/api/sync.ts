@@ -1,3 +1,4 @@
+import { envStr } from "../context";
 // Live-data server functions: validate → authorize → write D1 → publish delta.
 import { z } from "zod";
 import * as v from "@security/validation";
@@ -45,7 +46,7 @@ export async function getChangesSince(raw: unknown) {
 export async function getRealtimeTicket() {
   const { me } = await ctx();
   const { mintRealtimeToken } = await import("@security/realtime-token.server");
-  const url = process.env["REALTIME_URL"];
+  const url = envStr("REALTIME_URL");
   if (!url) throw new Error("Real-time is not configured");
   return { url, token: await mintRealtimeToken(me.id) };
 }

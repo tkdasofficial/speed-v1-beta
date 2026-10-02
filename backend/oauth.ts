@@ -1,13 +1,14 @@
+import { envStr } from "./context";
 export type Provider = "google" | "github";
 
 export function appOrigin(request: Request) {
-  return process.env["APP_URL"]?.replace(/\/$/, "") || new URL(request.url).origin;
+  return envStr("APP_URL")?.replace(/\/$/, "") || new URL(request.url).origin;
 }
 export const callbackUrl = (request: Request, p: Provider) => `${appOrigin(request)}/api/public/auth/callback/${p}`;
 
 export function providerConfig(p: Provider) {
-  const id = process.env[p === "google" ? "GOOGLE_CLIENT_ID" : "GITHUB_CLIENT_ID"];
-  const secret = process.env[p === "google" ? "GOOGLE_CLIENT_SECRET" : "GITHUB_CLIENT_SECRET"];
+  const id = envStr(p === "google" ? "GOOGLE_CLIENT_ID" : "GITHUB_CLIENT_ID");
+  const secret = envStr(p === "google" ? "GOOGLE_CLIENT_SECRET" : "GITHUB_CLIENT_SECRET");
   return id && secret ? { id, secret } : null;
 }
 
