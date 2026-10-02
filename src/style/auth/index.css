@@ -143,3 +143,5 @@
   .au-main { height: 100dvh; overflow-y: auto; }
   .au-panel { flex: 0 0 auto; margin: auto; padding: 16px 0; }
 }
+
+.au-panel .auth-full, .au-panel .auth-full * { color: var(--cta-foreground) !important; }

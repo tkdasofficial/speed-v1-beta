@@ -111,3 +111,9 @@
 .sp-page .sp-skel { border-radius: 16px; }
 .sp-dialog { border-radius: 18px !important; border: 1px solid var(--border); background: linear-gradient(180deg, var(--card), var(--background)); box-shadow: 0 40px 120px -40px color-mix(in oklab, var(--primary) 50%, transparent); }
 @media (min-width: 760px) { .sp-body { padding: 8px 28px 40px; gap: 14px; } }
+
+/* Shared primary and destructive page actions. */
+.sp-btn.is-primary { background: var(--cta); border-color: var(--cta); color: var(--cta-foreground); }
+.sp-btn.is-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--cta) 92%, var(--background) 8%); }
+.sp-btn.is-primary svg, .sp-btn.is-primary * { color: var(--cta-foreground) !important; }
+.sp-btn.is-danger { color: var(--destructive); border-color: color-mix(in oklab, var(--destructive) 50%, transparent); }

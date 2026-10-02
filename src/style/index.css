@@ -220,8 +220,7 @@ h1 { margin: 18px 0 6px; font: 600 clamp(40px,5vw,68px)/1.02 "Manrope", ui-sans-
 @media(max-width:760px){.mobile-drawer .workspace-pill{margin:8px 0 7px;min-height:32px;height:32px}}
 
 /* Color hierarchy: #F5F5F5 = primary action, blue = link/active/selected */
-.sp-btn.is-primary,.new-project,.drawer-new{background:var(--cta);border-color:var(--cta);color:var(--cta-foreground)}
-.sp-btn.is-primary:hover:not(:disabled),.new-project:hover,.drawer-new:hover{background:color-mix(in oklab,var(--cta) 92%,#000000 8%)}
-.sp-btn.is-primary svg,.new-project svg,.drawer-new svg{color:var(--cta-foreground)}
-.sp-btn.is-danger{color:#FF3B3B;border-color:color-mix(in oklab,#FF3B3B 50%,transparent)}
-.sp-btn.is-primary,.sp-btn.is-primary *,.new-project,.new-project *,.drawer-new,.drawer-new *,.auth-full,.auth-full *,.bg-cta,.bg-cta *{color:#000000!important}
+.new-project,.drawer-new{background:var(--cta);border-color:var(--cta);color:var(--cta-foreground)}
+.new-project:hover,.drawer-new:hover{background:color-mix(in oklab,var(--cta) 92%,var(--background) 8%)}
+.new-project svg,.drawer-new svg{color:var(--cta-foreground)}
+.new-project,.new-project *,.drawer-new,.drawer-new *,.bg-cta,.bg-cta *{color:var(--cta-foreground)!important}
