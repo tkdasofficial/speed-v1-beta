@@ -1,6 +1,6 @@
 // Records an authoritative change in change_log, then pushes it to the user's
 // relay hub. If the push fails, clients recover the event via changesSince().
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 import type { Entity, EntityMap, SyncEvent } from "./events";
 
 export async function publish<K extends Entity>(userId: string, entity: K, op: "upsert" | "delete", id: string, version: number, data: EntityMap[K] | null) {

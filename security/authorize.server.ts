@@ -1,6 +1,6 @@
 // Server-side authorization. Every protected server function calls requireUser()
 // and the relevant ownership check; client-side flags are never trusted.
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 import { SESSION_COOKIE, userFromToken } from "./session.server";
 
 export class AuthError extends Error {

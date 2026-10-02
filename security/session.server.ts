@@ -1,4 +1,4 @@
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 
 export const SESSION_COOKIE = "speed_session";
 export const SESSION_TTL = 60 * 60 * 24 * 30; // 30 days

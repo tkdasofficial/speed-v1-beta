@@ -1,13 +1,12 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { AuthHeader } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-import { resetPassword } from "@/lib/auth/auth.functions";
+import { resetPassword } from "@/lib/api/auth";
 
 export function ResetPasswordPage() {
-  const reset = useServerFn(resetPassword);
+  const reset = resetPassword;
   const [token, setToken] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");

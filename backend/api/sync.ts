@@ -6,7 +6,7 @@ import type { Json, Message, Profile, Project, Snapshot, StateEntry, Task } from
 
 async function ctx() {
   const { requireUser } = await import("@security/authorize.server");
-  const { d1 } = await import("@/lib/d1/d1.server");
+  const { d1 } = await import("@backend/d1");
   const { publish } = await import("@realtime/publish.server");
   return { me: await requireUser(), d1, publish };
 }

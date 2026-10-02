@@ -1,16 +1,15 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AuthHeader } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-import { requestPasswordReset } from "@/lib/auth/auth.functions";
+import { requestPasswordReset } from "@/lib/api/auth";
 
 const emailSchema = z.string().trim().email("Enter a valid email").max(255);
 
 export function ForgotPasswordPage() {
-  const request = useServerFn(requestPasswordReset);
+  const request = requestPasswordReset;
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

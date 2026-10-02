@@ -1,6 +1,6 @@
 // Stripe webhook verification and subscription → entitlement persistence.
 // Inactive until STRIPE_WEBHOOK_SECRET is configured.
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 
 const enc = new TextEncoder();
 const hex = (b: ArrayBuffer) => Array.from(new Uint8Array(b), (x) => x.toString(16).padStart(2, "0")).join("");

@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { getMe } from "@/lib/auth/auth.functions";
+import { getMe } from "@/lib/api/auth";
 import { bootShell } from "@shell/index";
 
 // Authentication-first gate: the session is validated server-side (cookie) before

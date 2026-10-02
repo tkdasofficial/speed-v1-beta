@@ -1,11 +1,10 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AuthHeader } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-import { saveProfile } from "@/lib/auth/auth.functions";
+import { saveProfile } from "@/lib/api/auth";
 
 const schema = z.object({
   fullName: z.string().trim().min(1, "Enter your full name").max(100),
@@ -15,7 +14,7 @@ const schema = z.object({
 
 export function GettingStartedPage() {
   const navigate = useNavigate();
-  const save = useServerFn(saveProfile);
+  const save = saveProfile;
   const [form, setForm] = useState({ fullName: "", role: "", teamType: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

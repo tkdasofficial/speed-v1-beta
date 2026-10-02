@@ -13,7 +13,7 @@ async function setSession(userId: string) {
 export const signUp = createServerFn({ method: "POST" })
   .validator((d) => creds.parse(d))
   .handler(async ({ data }) => {
-    const { d1 } = await import("@/lib/d1/d1.server");
+    const { d1 } = await import("@backend/d1");
     const { hashPassword } = await import("@security/session.server");
     const exists = await d1("SELECT id FROM users WHERE email = ?", [data.email]);
     if (exists.length) return { ok: false as const, error: "An account with this email already exists" };
@@ -21,7 +21,7 @@ export const signUp = createServerFn({ method: "POST" })
     await d1("INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)", [id, data.email, await hashPassword(data.password)]);
     await d1("INSERT INTO profiles (user_id) VALUES (?)", [id]);
     await setSession(id);
-    const { issueVerifyCode } = await import("@/lib/email/send.server");
+    const { issueVerifyCode } = await import("@backend/email/send.server");
     await issueVerifyCode(id, data.email);
     return { ok: true as const };
   });
@@ -36,14 +36,14 @@ async function requestMeta() {
 export const signIn = createServerFn({ method: "POST" })
   .validator((d) => z.object({ email: z.string().trim().toLowerCase().email().max(255), password: z.string().min(1).max(72) }).parse(d))
   .handler(async ({ data }) => {
-    const { d1 } = await import("@/lib/d1/d1.server");
+    const { d1 } = await import("@backend/d1");
     const { verifyPassword } = await import("@security/session.server");
     const rows = await d1<{ id: string; email: string; password_hash: string | null; email_verified: number }>("SELECT id, email, password_hash, email_verified FROM users WHERE email = ?", [data.email]);
     const u = rows[0];
     if (!u?.password_hash || !(await verifyPassword(data.password, u.password_hash))) return { ok: false as const, error: "Incorrect email or password" };
     await setSession(u.id);
     if (u.email_verified) {
-      const { sendEmail, nowText } = await import("@/lib/email/send.server");
+      const { sendEmail, nowText } = await import("@backend/email/send.server");
       await sendEmail("loginAlert", u.email, { when: nowText(), ...(await requestMeta()) }, { userId: u.id });
     }
     return { ok: true as const, verified: !!u.email_verified };
@@ -60,8 +60,8 @@ export const verifyEmail = createServerFn({ method: "POST" })
     const me = await sessionUser();
     if (!me) return { ok: false as const, error: "Please log in again" };
     if (me.email_verified) return { ok: true as const };
-    const { d1 } = await import("@/lib/d1/d1.server");
-    const { hashCode } = await import("@/lib/email/send.server");
+    const { d1 } = await import("@backend/d1");
+    const { hashCode } = await import("@backend/email/send.server");
     const now = Math.floor(Date.now() / 1000);
     const [row] = await d1<{ id: string; code_hash: string; attempts: number; expires_at: number }>(
       "SELECT id, code_hash, attempts, expires_at FROM email_codes WHERE user_id = ? AND purpose = 'verify' ORDER BY created_at DESC LIMIT 1", [me.id]);
@@ -80,15 +80,15 @@ export const resendVerifyCode = createServerFn({ method: "POST" }).handler(async
   const me = await sessionUser();
   if (!me) return { ok: false as const, error: "Please log in again" };
   if (me.email_verified) return { ok: true as const };
-  const { issueVerifyCode } = await import("@/lib/email/send.server");
+  const { issueVerifyCode } = await import("@backend/email/send.server");
   return issueVerifyCode(me.id, me.email);
 });
 
 export const requestPasswordReset = createServerFn({ method: "POST" })
   .validator((d) => z.object({ email: z.string().trim().toLowerCase().email().max(255) }).parse(d))
   .handler(async ({ data }) => {
-    const { d1 } = await import("@/lib/d1/d1.server");
-    const { hashCode, sendEmail } = await import("@/lib/email/send.server");
+    const { d1 } = await import("@backend/d1");
+    const { hashCode, sendEmail } = await import("@backend/email/send.server");
     const { randomId } = await import("@security/session.server");
     const { getRequestUrl } = await import("@tanstack/react-start/server");
     const [u] = await d1<{ id: string; email: string }>("SELECT id, email FROM users WHERE email = ?", [data.email]);
@@ -110,8 +110,8 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
 export const resetPassword = createServerFn({ method: "POST" })
   .validator((d) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/), password: z.string().min(8).max(72) }).parse(d))
   .handler(async ({ data }) => {
-    const { d1 } = await import("@/lib/d1/d1.server");
-    const { hashCode, sendEmail, nowText } = await import("@/lib/email/send.server");
+    const { d1 } = await import("@backend/d1");
+    const { hashCode, sendEmail, nowText } = await import("@backend/email/send.server");
     const { hashPassword } = await import("@security/session.server");
     const now = Math.floor(Date.now() / 1000);
     const [row] = await d1<{ user_id: string; email: string }>(
@@ -144,7 +144,7 @@ export const saveProfile = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { getCookie } = await import("@tanstack/react-start/server");
     const { userFromToken, SESSION_COOKIE } = await import("@security/session.server");
-    const { d1 } = await import("@/lib/d1/d1.server");
+    const { d1 } = await import("@backend/d1");
     const me = await userFromToken(getCookie(SESSION_COOKIE));
     if (!me) return { ok: false as const, error: "Please log in again" };
     await d1(

@@ -1,15 +1,14 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { AuthHeader } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-import { resendVerifyCode, verifyEmail } from "@/lib/auth/auth.functions";
+import { resendVerifyCode, verifyEmail } from "@/lib/api/auth";
 
 export function VerifyEmailPage() {
   const navigate = useNavigate();
-  const verify = useServerFn(verifyEmail);
-  const resend = useServerFn(resendVerifyCode);
+  const verify = verifyEmail;
+  const resend = resendVerifyCode;
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [note, setNote] = useState("");

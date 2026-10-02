@@ -11,7 +11,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { RealtimeClient, type ConnState } from "@realtime/client";
 import { applyEvent, applySnapshot, keys } from "@realtime/store";
 import type { Snapshot } from "@realtime/events";
-import { getChangesSince, getRealtimeTicket, getSnapshot } from "@/lib/sync/sync.functions";
+import { getChangesSince, getRealtimeTicket, getSnapshot } from "@/lib/api/sync";
 import { idbClear, idbGet, idbSet } from "./idb";
 
 type Shell = { userId: string; rt: RealtimeClient; ready: Promise<void>; unsub: () => void };
