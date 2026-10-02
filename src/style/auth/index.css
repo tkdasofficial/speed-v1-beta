@@ -3,7 +3,7 @@
 .au-shell a { text-decoration: none; }
 .au-shell svg { flex: none; }
 .au-brand { display: inline-flex; align-items: center; color: var(--foreground) !important; }
-.au-brand .app-icon { width: 42px; height: 42px; }
+.au-brand .app-icon { width: 42px; height: 42px; flex: 0 0 42px; }
 
 /* Showcase panel (desktop) */
 .au-aside { display: none; position: relative; overflow: hidden; flex-direction: column; justify-content: space-between; padding: 32px 40px; border-right: 1px solid var(--border); background: linear-gradient(180deg, var(--card), var(--background)); }
