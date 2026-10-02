@@ -1,6 +1,12 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bot, ChevronDown, CircleHelp, FolderGit2, Import, Layers3, Library, LogOut, MoreHorizontal, PanelLeft, Pin, Plus, Search, Settings, X } from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useProfile, useProjects } from "@/lib/sync";
+import { deleteProject } from "@/lib/sync/sync.functions";
+import { signOut } from "@/lib/auth/auth.functions";
+import { teardownShell } from "@shell/index";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -10,7 +16,6 @@ function BrandMark() {
   return <div className="speed-sidebar__brand"><BrandLogo /><b>SPEED</b></div>;
 }
 
-const allProjects: { name: string; chat: boolean }[] = [];
 const workspaces = ["Personal workspace", "Team workspace"];
 
 type SidebarPanelProps = {
@@ -23,7 +28,15 @@ type SidebarPanelProps = {
 function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPanelProps) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const [projects, setProjects] = useState(allProjects);
+  const live = useProjects() ?? [];
+  const projects = live.map((p) => ({ id: p.id, name: p.name, chat: true }));
+  const profile = useProfile();
+  const qc = useQueryClient();
+  const removeProject = useServerFn(deleteProject);
+  const doSignOut = useServerFn(signOut);
+  const displayName = profile?.displayName || profile?.email || "Account";
+  const initials = displayName.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("");
+  const logout = async () => { await doSignOut(); teardownShell(qc); qc.removeQueries({ queryKey: ["me"] }); void navigate({ to: "/auth/login" }); };
   const [pinned, setPinned] = useState<string[]>([]);
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [search, setSearch] = useState<string | null>(null);
@@ -58,7 +71,7 @@ function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPa
       <Button variant="ghost" className="speed-sidebar__project-open" onClick={() => setWorkspace(project.name)}>{project.chat ? <Bot /> : <FolderGit2 />}<span>{project.name}</span></Button>
       <Button variant="ghost" size="icon" className={`speed-sidebar__icon speed-sidebar__project-actions ${pinned.includes(project.name) ? "is-pinned" : ""}`} aria-label={`${pinned.includes(project.name) ? "Unpin" : "Pin"} ${project.name}`} title={pinned.includes(project.name) ? "Unpin project" : "Pin project"} onClick={() => togglePin(project.name)}><Pin /></Button>
       <Button variant="ghost" size="icon" className="speed-sidebar__icon speed-sidebar__project-actions" aria-label={`More options for ${project.name}`} aria-expanded={menuFor === project.name} title="Project options" onClick={() => setMenuFor(menuFor === project.name ? null : project.name)}><MoreHorizontal /></Button>
-      {menuFor === project.name && <div className="speed-sidebar__menu is-project"><Button variant="ghost" onClick={() => setWorkspace(project.name)}>Open</Button><Button variant="ghost" onClick={() => { togglePin(project.name); setMenuFor(null); }}>{pinned.includes(project.name) ? "Unpin" : "Pin"}</Button><Button variant="ghost" onClick={() => { setProjects((current) => current.filter((item) => item.name !== project.name)); setMenuFor(null); }}>Remove</Button></div>}
+      {menuFor === project.name && <div className="speed-sidebar__menu is-project"><Button variant="ghost" onClick={() => setWorkspace(project.name)}>Open</Button><Button variant="ghost" onClick={() => { togglePin(project.name); setMenuFor(null); }}>{pinned.includes(project.name) ? "Unpin" : "Pin"}</Button><Button variant="ghost" onClick={() => { void removeProject({ data: { id: project.id } }); setMenuFor(null); }}>Remove</Button></div>}
     </div>)}</div>
     <div className="speed-sidebar__account-wrap">
       {settingsOpen && <div className="speed-sidebar__menu is-up" aria-label="Account menu">
@@ -69,9 +82,9 @@ function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPa
         <Button variant="ghost" asChild><Link to="/privacy-policy" onClick={close}>Privacy Policy</Link></Button>
         <Button variant="ghost" onClick={() => { setSettingsOpen(false); setLogoutOpen(true); }}><LogOut /> Log Out</Button>
       </div>}
-      <div className="speed-sidebar__account"><Button variant="ghost" className="speed-sidebar__account-main" aria-label="Open account menu" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}><span className="speed-sidebar__avatar">TK</span><span className="speed-sidebar__account-copy"><b>TK Das</b><small>Personal workspace</small></span><ChevronDown className={settingsOpen ? "is-open" : ""} /></Button></div>
+      <div className="speed-sidebar__account"><Button variant="ghost" className="speed-sidebar__account-main" aria-label="Open account menu" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}><span className="speed-sidebar__avatar">{initials}</span><span className="speed-sidebar__account-copy"><b>{displayName}</b><small>Personal workspace</small></span><ChevronDown className={settingsOpen ? "is-open" : ""} /></Button></div>
     </div>
-    <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Log Out unavailable</AlertDialogTitle><AlertDialogDescription>This preview does not have a signed-in account yet.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogAction>OK</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+    <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Log out?</AlertDialogTitle><AlertDialogDescription>You will need to sign in again to open your projects.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogAction onClick={() => void logout()}>Log out</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </aside>;
 
   return mobile ? <div className="speed-sidebar-backdrop" onClick={close}>{panel}</div> : panel;

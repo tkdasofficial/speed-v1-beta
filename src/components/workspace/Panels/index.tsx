@@ -1,6 +1,9 @@
 import { AlertTriangle, Check, Loader2, Smartphone, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Task } from "@/lib/workspace-types";
+import { useServerFn } from "@tanstack/react-start";
+import { useTasks } from "@/lib/sync";
+import { createTask, deleteTask, updateTask } from "@/lib/sync/sync.functions";
 
 export function PreviewView({ hasPreview, projectName, path, reloadKey, onBack }: { hasPreview: boolean; projectName: string; path: string; reloadKey: number; onBack: () => void }) {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
@@ -81,10 +84,14 @@ function Empty({ icon: Icon, title, body, action, onAction, tone }: { icon: type
   );
 }
 
-export function TasksSheet({ onClose }: { onClose: () => void }) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+export function TasksSheet({ onClose, projectId }: { onClose: () => void; projectId: string | undefined }) {
+  const live = useTasks(projectId);
+  const tasks: Task[] = live.map((t) => ({ id: t.id, title: t.title, desc: t.description, status: t.status as Task["status"] }));
+  const add = useServerFn(createTask);
+  const upd = useServerFn(updateTask);
+  const del = useServerFn(deleteTask);
   const [draft, setDraft] = useState("");
-  const move = (id: string, status: Task["status"] | null) => setTasks((t) => (status ? t.map((x) => (x.id === id ? { ...x, status, progress: status === "active" ? 10 : undefined } : x)) : t.filter((x) => x.id !== id)));
+  const move = (id: string, status: Task["status"] | null) => void (status ? upd({ data: { id, status } }) : del({ data: { id } }));
   const groups: { key: Task["status"]; label: string; empty: string }[] = [
     { key: "ready", label: "Ready", empty: "No tasks waiting for review" },
     { key: "active", label: "Active", empty: "No running tasks" },
@@ -121,7 +128,7 @@ export function TasksSheet({ onClose }: { onClose: () => void }) {
           })}
         </div>
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); if (!draft.trim()) return; setTasks([...tasks, { id: String(Date.now()), title: draft.trim(), desc: "New draft task", status: "draft" }]); setDraft(""); }} className="flex shrink-0 gap-2 border-t border-border p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+      <form onSubmit={(e) => { e.preventDefault(); if (!draft.trim() || !projectId) return; void add({ data: { projectId, title: draft.trim(), description: "New draft task" } }); setDraft(""); }} className="flex shrink-0 gap-2 border-t border-border p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
         <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="New task…" className="h-10 min-w-0 flex-1 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] outline-none focus:border-primary" />
         <button type="submit" disabled={!draft.trim()} className="h-10 rounded-[12px] bg-cta px-4 text-[14px] font-semibold text-cta-foreground disabled:bg-accent disabled:text-muted-foreground">Add</button>
       </form>
