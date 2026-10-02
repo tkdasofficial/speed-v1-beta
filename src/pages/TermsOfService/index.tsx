@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/PageShell";
+import "@/style/TermsOfService/index.css";
 
 
 export function TermsPage() {

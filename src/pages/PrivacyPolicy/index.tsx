@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/PageShell";
+import "@/style/PrivacyPolicy/index.css";
 
 
 export function PrivacyPage() {

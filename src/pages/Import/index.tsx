@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Check, Figma, FolderUp, Github, Loader2, Lock, Globe, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { PageShell, StateBox } from "@/components/PageShell";
+import "@/style/Import/index.css";
 
 
 function Bitbucket() {

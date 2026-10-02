@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, FileText, UserRound } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
+import "@/style/Settings/index.css";
 
 
 export function SettingsPage() {

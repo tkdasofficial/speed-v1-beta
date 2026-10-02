@@ -24,6 +24,6 @@
 - Keep signup credentials separate from the UI-only Getting Started profile form; this preserves the mock auth boundary while collecting onboarding details afterward.
 - All page top bars render the single global Header component (left / title / right slots, workspace-header sizing); never add page-specific headers, to keep size and behavior identical everywhere.
 - Folder-per-module with index files: page bodies in src/pages/<Name>/index.tsx (page CSS beside it), components in src/components/<Name>/index.tsx, helpers in src/lib/<name>/index.ts; src/routes files stay thin (createFileRoute + head + imported page) because TanStack routing requires them there. shadcn primitives stay flat in src/components/ui.
-- Landing page sections live in src/components/landing/<Name>/index.tsx and its styles in src/style/landing/index.css (scoped .lp- classes); keeps the landing self-contained from app styles.
-- Auth screens (login, signup, forgot password, getting started) render inside the shared AuthShell component with styles in src/style/auth/index.css (scoped .au- classes); keeps sign-in styling consistent with the landing.
-- Dashboard and PageShell pages share the landing-quality layer in src/style/app/index.css; PageShell relies on the global header title and never repeats page names inside the scroll area.
+- Each page and reusable shell imports its own `src/style/<Name>/index.css`; this keeps style ownership explicit and prevents unrelated page rules from conflicting.
+- Landing sections use scoped `.lp-` classes and auth screens render inside the shared AuthShell with scoped `.au-` classes; this preserves visual isolation.
+- Dashboard and PageShell share only PageShell-owned primitives; PageShell relies on the global header title and never repeats page names inside the scroll area.
