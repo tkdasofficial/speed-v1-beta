@@ -46,9 +46,8 @@ export const signOut = createServerFn({ method: "POST" }).handler(async () => {
 });
 
 export const getMe = createServerFn({ method: "GET" }).handler(async () => {
-  const { getCookie } = await import("@tanstack/react-start/server");
-  const { userFromToken, SESSION_COOKIE } = await import("@security/session.server");
-  return userFromToken(getCookie(SESSION_COOKIE));
+  const { currentUser } = await import("@security/authorize.server");
+  return currentUser();
 });
 
 export const saveProfile = createServerFn({ method: "POST" })
@@ -64,5 +63,9 @@ export const saveProfile = createServerFn({ method: "POST" })
        ON CONFLICT(user_id) DO UPDATE SET display_name=excluded.display_name, role=excluded.role, company=excluded.company, onboarded=1, updated_at=datetime('now')`,
       [me.id, data.fullName, data.role, data.teamType],
     );
+    const [row] = await d1<{ display_name: string | null; avatar_url: string | null; version: number }>(
+      "UPDATE profiles SET version = version + 1 WHERE user_id = ? RETURNING display_name, avatar_url, version", [me.id]);
+    const { publish } = await import("@realtime/publish.server");
+    if (row) await publish(me.id, "profile", "upsert", me.id, row.version, { email: me.email, displayName: row.display_name, avatarUrl: row.avatar_url, version: row.version });
     return { ok: true as const };
   });

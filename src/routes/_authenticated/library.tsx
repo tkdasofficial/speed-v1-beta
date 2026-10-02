@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LibraryPage } from "@/pages/Library";
 
-export const Route = createFileRoute("/library")({
+export const Route = createFileRoute("/_authenticated/library")({
   head: () => ({
     meta: [
       { title: "Library — Speed Agent" },

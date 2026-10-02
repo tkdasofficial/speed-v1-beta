@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ImportPage } from "@/pages/Import";
 
-export const Route = createFileRoute("/import")({
+export const Route = createFileRoute("/_authenticated/import")({
   head: () => ({
     meta: [
       { title: "Import — Speed Agent" },

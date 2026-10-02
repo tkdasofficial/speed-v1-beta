@@ -28,3 +28,8 @@
 - Each page and reusable shell imports its own `src/style/<Name>/index.css`; this keeps style ownership explicit and prevents unrelated page rules from conflicting.
 - Landing sections use scoped `.lp-` classes and auth screens render inside the shared AuthShell with scoped `.au-` classes; this preserves visual isolation.
 - Dashboard and PageShell share only PageShell-owned primitives; PageShell relies on the global header title and never repeats page names inside the scroll area.
+- Root layers: `security/` (server-only TS: sessions, authorization, entitlements, Stripe verification, validation), `real-time/` (delta events, publish-after-write, client sync, relay Worker), `shell/` (boot orchestration, Service Worker, IndexedDB); keeps concerns separated.
+- Every live-data write goes validate → authorize → D1 write (bump `version`) → `publish()` to change_log + relay; clients never change shared state locally, so the server stays authoritative.
+- Real-time relay is a Cloudflare Worker + per-user Durable Object (`real-time/worker`, deploy with `bun ./real-time/worker/deploy.ts`); clients join with short-lived HMAC tokens and recover gaps via change_log, so no polling is needed.
+- Protected pages live under `src/routes/_authenticated/`, whose server-side cookie check runs before any protected code or data; the App Shell boots only after it passes.
+- Service Worker only caches build assets and page HTML, never server functions or API routes, and registers only in production builds.

@@ -44,11 +44,13 @@ import {
 import { useState } from "react";
 import { AppDrawer, DesktopSidebar } from "@/components/AppDrawer";
 import { projectSlug } from "@/lib/projects";
+import { useServerFn } from "@tanstack/react-start";
+import { useProjects } from "@/lib/sync";
+import { createProject, sendMessage } from "@/lib/sync/sync.functions";
 import "@/style/Dashboard/index.css";
 
 
 type PreviewKind = "copilot" | "analytics" | "store" | "developer";
-const dashboardProjects: { name: string; kind: string; preview: PreviewKind }[] = [];
 
 function ProjectPreview({ type }: { type: PreviewKind }) {
   return <span className={`project-thumb preview-${type}`} aria-hidden="true">
@@ -74,10 +76,22 @@ export function EvoAgent() {
   const [prompt, setPrompt] = useState("");
   const [running, setRunning] = useState(false);
 
-  const beginTask = () => {
-    if (!prompt.trim()) return;
+  const create = useServerFn(createProject);
+  const send = useServerFn(sendMessage);
+  const beginTask = async () => {
+    const text = prompt.trim();
+    if (!text || running) return;
     setRunning(true);
-    openProject(prompt.trim().slice(0, 40));
+    try {
+      const p = await create({ data: { name: text.slice(0, 40) } });
+      await send({ data: { projectId: p.id, content: text } });
+      setPrompt("");
+      void navigate({ to: "/project/$projectId", params: { projectId: p.slug } });
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Could not create the project");
+    } finally {
+      setRunning(false);
+    }
   };
 
   return (
@@ -86,7 +100,7 @@ export function EvoAgent() {
 
       <div className="main-frame">
 
-        <Home openProject={openProject} openDrawer={() => setDrawer(true)} prompt={prompt} setPrompt={setPrompt} beginTask={beginTask} />
+        <Home openProject={openProject} openDrawer={() => setDrawer(true)} prompt={prompt} setPrompt={setPrompt} beginTask={() => void beginTask()} />
       </div>
 
       <AppDrawer open={drawer} onClose={() => setDrawer(false)} onOpenProject={openProject} onNew={() => { setPrompt(""); setRunning(false); }} />
@@ -95,6 +109,7 @@ export function EvoAgent() {
 }
 
 function Home({ openProject, openDrawer, prompt, setPrompt, beginTask }: { openProject: (name: string) => void; openDrawer: () => void; prompt: string; setPrompt: (v: string) => void; beginTask: () => void }) {
+  const dashboardProjects = (useProjects() ?? []).map((p) => ({ name: p.name, slug: p.slug, kind: "Agent project", preview: "copilot" as PreviewKind }));
   return (
     <main className="home-page">
       <div className="home-inner">
@@ -106,7 +121,7 @@ function Home({ openProject, openDrawer, prompt, setPrompt, beginTask }: { openP
           <div className="projects-head"><span id="projects-heading">Projects</span><button>Show all <ChevronRight /></button></div>
           <div className="project-scroll">
             {dashboardProjects.map((project) => (
-              <button className="project-card" key={project.name} onClick={() => openProject(project.name)}>
+              <button className="project-card" key={project.name} onClick={() => openProject(project.slug)}>
                  <ProjectPreview type={project.preview} />
                 <span className="project-meta"><b>{project.name}</b><small>{project.kind}</small></span>
               </button>

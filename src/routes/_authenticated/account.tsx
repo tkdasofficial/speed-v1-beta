@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AccountPage } from "@/pages/Account";
 
-export const Route = createFileRoute("/account")({
+export const Route = createFileRoute("/_authenticated/account")({
   head: () => ({ meta: [
     { title: "Account — Speed Agent" },
     { name: "description", content: "Account overview in Speed Agent." },

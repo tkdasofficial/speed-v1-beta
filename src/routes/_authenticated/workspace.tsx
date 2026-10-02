@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/workspace")({
+export const Route = createFileRoute("/_authenticated/workspace")({
   head: () => ({ meta: [
     { title: "Workspace — Speed Agent" },
     { name: "description", content: "Continue working in your Speed Agent project." },
@@ -9,5 +9,5 @@ export const Route = createFileRoute("/workspace")({
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
-  beforeLoad: () => { throw redirect({ to: "/project/$projectId", params: { projectId: "websitetoapk" } }); },
+  beforeLoad: () => { throw redirect({ to: "/dashboard" }); },
 });

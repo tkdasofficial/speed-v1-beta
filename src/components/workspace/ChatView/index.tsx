@@ -2,9 +2,9 @@ import { ArrowDown, Bot, CheckCircle2, Clock, Loader2, XCircle } from "lucide-re
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionGroup } from "@/components/workspace/ActionGroup";
 import { ChatInput } from "@/components/ChatInput";
-import { uid, type ChatItem } from "@/lib/workspace-types";
+import type { ChatItem } from "@/lib/workspace-types";
 
-export function ChatView({ items, setItems }: { items: ChatItem[]; setItems: React.Dispatch<React.SetStateAction<ChatItem[]>> }) {
+export function ChatView({ items, onSend }: { items: ChatItem[]; onSend: (text: string) => void }) {
   const scroller = useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -28,13 +28,12 @@ export function ChatView({ items, setItems }: { items: ChatItem[]; setItems: Rea
 
   const send = (text: string) => {
     setAtBottom(true);
-    setItems((prev) => [...prev, { id: uid(), type: "user", text, time: "Just now" }]);
+    onSend(text);
   };
 
   const stop = () => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    setItems((p) => [...p.filter((i) => !(i.type === "status" && i.state === "running")).map((i) => i.type === "actions" ? { ...i, actions: i.actions.map((a) => a.status === "running" ? { ...a, status: "failed" as const } : a) } : i), { id: uid(), type: "status", text: "Stopped by you", state: "failed" }]);
     setBusy(false);
   };
 
