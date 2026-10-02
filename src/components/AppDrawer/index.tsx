@@ -29,7 +29,7 @@ function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPa
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const live = useProjects() ?? [];
-  const projects = live.map((p) => ({ id: p.id, name: p.name, chat: true }));
+  const projects = live.map((p) => ({ id: p.id, slug: p.slug, name: p.name, chat: true }));
   const profile = useProfile();
   const qc = useQueryClient();
   const removeProject = useServerFn(deleteProject);
@@ -68,10 +68,10 @@ function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPa
     </nav>
     <div className="speed-sidebar__section-head"><span>Recent</span><span>{list.length}</span></div>
     <div className="speed-sidebar__projects">{list.length === 0 && <p className="speed-sidebar__empty">No projects found</p>}{list.map((project) => <div key={project.name} className="speed-sidebar__project">
-      <Button variant="ghost" className="speed-sidebar__project-open" onClick={() => setWorkspace(project.name)}>{project.chat ? <Bot /> : <FolderGit2 />}<span>{project.name}</span></Button>
+      <Button variant="ghost" className="speed-sidebar__project-open" onClick={() => setWorkspace(project.slug)}>{project.chat ? <Bot /> : <FolderGit2 />}<span>{project.name}</span></Button>
       <Button variant="ghost" size="icon" className={`speed-sidebar__icon speed-sidebar__project-actions ${pinned.includes(project.name) ? "is-pinned" : ""}`} aria-label={`${pinned.includes(project.name) ? "Unpin" : "Pin"} ${project.name}`} title={pinned.includes(project.name) ? "Unpin project" : "Pin project"} onClick={() => togglePin(project.name)}><Pin /></Button>
       <Button variant="ghost" size="icon" className="speed-sidebar__icon speed-sidebar__project-actions" aria-label={`More options for ${project.name}`} aria-expanded={menuFor === project.name} title="Project options" onClick={() => setMenuFor(menuFor === project.name ? null : project.name)}><MoreHorizontal /></Button>
-      {menuFor === project.name && <div className="speed-sidebar__menu is-project"><Button variant="ghost" onClick={() => setWorkspace(project.name)}>Open</Button><Button variant="ghost" onClick={() => { togglePin(project.name); setMenuFor(null); }}>{pinned.includes(project.name) ? "Unpin" : "Pin"}</Button><Button variant="ghost" onClick={() => { void removeProject({ data: { id: project.id } }); setMenuFor(null); }}>Remove</Button></div>}
+      {menuFor === project.name && <div className="speed-sidebar__menu is-project"><Button variant="ghost" onClick={() => setWorkspace(project.slug)}>Open</Button><Button variant="ghost" onClick={() => { togglePin(project.name); setMenuFor(null); }}>{pinned.includes(project.name) ? "Unpin" : "Pin"}</Button><Button variant="ghost" onClick={() => { void removeProject({ data: { id: project.id } }); setMenuFor(null); }}>Remove</Button></div>}
     </div>)}</div>
     <div className="speed-sidebar__account-wrap">
       {settingsOpen && <div className="speed-sidebar__menu is-up" aria-label="Account menu">
