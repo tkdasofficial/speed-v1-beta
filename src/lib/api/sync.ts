@@ -1,5 +1,5 @@
 // Live-data client — calls the Speed API Worker. Types come from the backend handlers (type-only import).
-import type * as S from "../../../backend/api/sync";
+import type * as S from "../../../cloudflare/functions/api/sync";
 import { endpoint } from "./index";
 
 export const getSnapshot = endpoint<typeof S.getSnapshot>("getSnapshot");

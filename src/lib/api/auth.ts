@@ -1,5 +1,5 @@
 // Auth client — calls the Speed API Worker. Types come from the backend handlers (type-only import).
-import type * as A from "../../../backend/api/auth";
+import type * as A from "../../../cloudflare/functions/api/auth";
 import { endpoint, setToken } from "./index";
 
 const withToken = <F extends (arg?: { data?: unknown }) => Promise<unknown>>(f: F) =>

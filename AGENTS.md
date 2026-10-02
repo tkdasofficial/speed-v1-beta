@@ -26,12 +26,10 @@
 - Each page and reusable shell imports its own `src/style/<Name>/index.css`; this keeps style ownership explicit and prevents unrelated page rules from conflicting.
 - Landing sections use scoped `.lp-` classes and auth screens render inside the shared AuthShell with scoped `.au-` classes; this preserves visual isolation.
 - Dashboard and PageShell share only PageShell-owned primitives; PageShell relies on the global header title and never repeats page names inside the scroll area.
-- Root layers: `security/` (server-only TS: sessions, authorization, entitlements, Stripe verification, validation), `real-time/` (delta events, publish-after-write, client sync, relay Worker), `shell/` (boot orchestration, Service Worker, IndexedDB); keeps concerns separated.
+- All Cloudflare backend code lives under `cloudflare/` (`functions/`, `security/`, `real-time/`, `migrations/`); `shell/` stays at root because it is browser code. Layers: `cloudflare/security/` (server-only TS: sessions, authorization, entitlements, Stripe verification, validation), `real-time/` (delta events, publish-after-write, client sync, relay Worker), `shell/` (boot orchestration, Service Worker, IndexedDB); keeps concerns separated.
 - Every live-data write goes validate → authorize → D1 write (bump `version`) → `publish()` to change_log + relay; clients never change shared state locally, so the server stays authoritative.
-- Real-time relay is a Cloudflare Worker + per-user Durable Object (`real-time/worker`, deploy with `bun ./real-time/worker/deploy.ts`); clients join with short-lived HMAC tokens and recover gaps via change_log, so no polling is needed.
 - Protected pages live under `src/routes/_authenticated/`, whose server-side cookie check runs before any protected code or data; the App Shell boots only after it passes.
 - Service Worker only caches build assets and page HTML, never server functions or API routes, and registers only in production builds.
-- All backend code runs in the standalone `speed-api` Cloudflare Worker (`backend/`, deploy with `bun backend/deploy.ts`); the frontend reaches it only via `VITE_API_URL` through `src/lib/api`, so either side can be re-hosted independently.
-- D1 is accessed only through the Worker's native `DB` binding (`backend/d1.ts`); allowed frontend origins come from the `ALLOWED_ORIGINS` Worker variable, never from code.
+- All backend code runs in the standalone `speed-api` Cloudflare Worker (`cloudflare/functions/`, deploy with `bun cloudflare/functions/deploy.ts`); the frontend reaches it only via `VITE_API_URL` through `src/lib/api`, so either side can be re-hosted independently.
 - Sessions are bearer tokens (hash stored in D1, raw token in browser storage) sent as `Authorization`; OAuth start/callback live on the Worker and return the token to an allowed origin's `/auth/oauth` page, so no cross-site cookies are needed.
-- All email goes through `backend/email/send.server.ts` (Gmail SMTP, Worker secrets); only the allowed types in templates.server.ts may be sent, never project-activity emails.
+- Cloudflare backend rules live in `cloudflare/AGENTS.md`.
