@@ -29,7 +29,7 @@
 
 /* Rows as feature cards */
 .sp-page .sp-list { gap: 10px; }
-.sp-page .sp-row { border: 1px solid var(--border); border-radius: 16px; background: linear-gradient(180deg, var(--card), #111); padding: 12px 12px 12px 14px; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.sp-page .sp-row { border: 1px solid var(--border); border-radius: 16px; background: linear-gradient(180deg, var(--card), #111); padding: 4px 8px 4px 4px; transition: border-color .2s, transform .2s, box-shadow .2s; }
 .sp-page .sp-row:hover { border-color: rgb(255 255 255 / .22); transform: translateY(-2px); box-shadow: 0 24px 60px -36px color-mix(in oklab, var(--primary) 70%, transparent); }
 .sp-page .sp-ico { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; background: color-mix(in oklab, var(--primary) 22%, transparent); border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent); color: var(--foreground); }
 .sp-page .sp-ico svg { width: 19px; height: 19px; }
@@ -41,8 +41,8 @@
 /* Segmented tabs, select, search */
 .sp-page .sp-seg { border-radius: 12px; padding: 4px; background: var(--card); border: 1px solid var(--border); }
 .sp-page .sp-seg button { border-radius: 9px; font-weight: 600; }
-.sp-page .sp-select, .sp-page .sp-input, .sp-dialog .sp-input { height: 42px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); font-family: inherit; transition: border-color .15s, box-shadow .15s; }
-.sp-page .sp-input:focus, .sp-dialog .sp-input:focus, .sp-page .sp-select:focus { outline: 0; border-color: color-mix(in oklab, var(--primary) 70%, var(--border)); box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 20%, transparent); }
+.sp-page .sp-select select, .sp-page .sp-input, .sp-dialog .sp-input { height: 42px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); font-family: inherit; transition: border-color .15s, box-shadow .15s; }
+.sp-page .sp-input:focus, .sp-dialog .sp-input:focus, .sp-page .sp-select select:focus { outline: 0; border-color: color-mix(in oklab, var(--primary) 70%, var(--border)); box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 20%, transparent); }
 .sp-page .sp-search { border-radius: 10px; }
 
 /* Empty / error states */
@@ -79,3 +79,4 @@
 .home-page .idea-list button { border-radius: 14px !important; background: linear-gradient(180deg, var(--card), #111) !important; font-weight: 500; transition: border-color .2s, transform .2s; }
 .home-page .idea-list button:hover { border-color: rgb(255 255 255 / .22) !important; transform: translateY(-2px); }
 .home-page .composer-wrap > * { border-radius: 18px; box-shadow: 0 30px 80px -30px color-mix(in oklab, var(--primary) 55%, transparent); }
+.sp-page .sp-select select { padding: 0 12px; font-weight: 600; }
