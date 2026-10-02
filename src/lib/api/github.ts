@@ -7,3 +7,5 @@ export const getProjectRepo = endpoint<typeof G.getProjectRepo>("getProjectRepo"
 export const linkProjectRepo = endpoint<typeof G.linkProjectRepo>("linkProjectRepo");
 export const unlinkProjectRepo = endpoint<typeof G.unlinkProjectRepo>("unlinkProjectRepo");
 export const verifyProjectRepo = endpoint<typeof G.verifyProjectRepo>("verifyProjectRepo");
+export const githubTree = endpoint<typeof G.githubTree>("githubTree");
+export const githubFile = endpoint<typeof G.githubFile>("githubFile");

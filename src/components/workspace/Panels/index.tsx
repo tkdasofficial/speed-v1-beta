@@ -1,7 +1,7 @@
-import { AlertTriangle, Check, Github, Globe, Loader2, Lock, Smartphone, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, FileText, Folder, Github, Globe, Loader2, Lock, Smartphone, X } from "lucide-react";
 import { oauthStartUrl } from "@/lib/api";
 import { getGithubConnection } from "@/lib/api/auth";
-import { getProjectRepo, githubRepos, linkProjectRepo, unlinkProjectRepo, verifyProjectRepo } from "@/lib/api/github";
+import { getProjectRepo, githubFile, githubRepos, githubTree, linkProjectRepo, unlinkProjectRepo, verifyProjectRepo } from "@/lib/api/github";
 import { useEffect, useState } from "react";
 import type { Task } from "@/lib/workspace-types";
 import { useTasks } from "@/lib/sync";
@@ -214,6 +214,69 @@ function RepoPicker({ projectId }: { projectId: string }) {
           </div>
         </div>
       )}
+      {linked && <RepoBrowser key={linked.id} projectId={projectId} />}
     </div>
   );
 }
+
+type Tree = Awaited<ReturnType<typeof githubTree>>;
+type OpenFile = Awaited<ReturnType<typeof githubFile>>;
+
+function RepoBrowser({ projectId }: { projectId: string }) {
+  const [tree, setTree] = useState<Tree | null>(null);
+  const [dir, setDir] = useState("");
+  const [file, setFile] = useState<OpenFile | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const fail = (e: unknown) => setErr(e instanceof Error ? e.message : "Something went wrong");
+
+  const loadTree = async () => { setBusy("tree"); setErr(null); try { setTree(await githubTree({ data: { projectId } })); } catch (e) { fail(e); } setBusy(null); };
+  const open = async (path: string) => { setBusy(path); setErr(null); try { setFile(await githubFile({ data: { projectId, path } })); } catch (e) { fail(e); } setBusy(null); };
+
+  if (!tree) return (
+    <div className="grid gap-1">
+      <button type="button" onClick={() => void loadTree()} disabled={!!busy} className="h-9 justify-self-start rounded-[11px] border border-border px-3 text-[13px] font-medium">{busy ? "Loading files…" : "Browse files"}</button>
+      {err && <p className="m-0 flex items-center gap-1.5 text-[13px] text-destructive"><AlertTriangle className="!h-4 !w-4" />{err}</p>}
+    </div>
+  );
+
+  const prefix = dir ? `${dir}/` : "";
+  const items = tree.entries.filter((e) => e.path.startsWith(prefix) && !e.path.slice(prefix.length).includes("/"));
+  const up = dir.includes("/") ? dir.slice(0, dir.lastIndexOf("/")) : "";
+
+  if (file) return (
+    <div className={`${card} grid gap-2 p-2`}>
+      <div className="flex items-center gap-2 px-1 text-[13px]">
+        <button type="button" onClick={() => setFile(null)} className="flex h-8 items-center gap-1 rounded-[10px] border border-border px-2 font-medium"><ChevronLeft className="!h-4 !w-4" />Files</button>
+        <span className="min-w-0 flex-1 truncate font-semibold">{file.path}</span>
+        <span className="shrink-0 text-[12px] text-muted-foreground">{file.size.toLocaleString()} B · {file.branch}</span>
+      </div>
+      {file.kind === "text"
+        ? <pre className="m-0 max-h-[60vh] overflow-auto rounded-[10px] border border-border bg-background p-3 text-[12px] leading-5"><code>{file.content}</code></pre>
+        : <p className="m-0 p-3 text-center text-[13px] text-muted-foreground">{file.kind === "binary" ? "This is a binary file and can't be shown as text." : file.kind === "too_large" ? "This file is too large to preview." : "This item can't be previewed."}</p>}
+    </div>
+  );
+
+  return (
+    <div className={`${card} grid gap-1 p-2`}>
+      <div className="flex items-center gap-2 px-1 text-[13px]">
+        {dir && <button type="button" onClick={() => setDir(up)} aria-label="Up one folder" className="grid h-8 w-8 place-items-center rounded-[10px] border border-border"><ChevronLeft className="!h-4 !w-4" /></button>}
+        <span className="min-w-0 flex-1 truncate font-semibold">{tree.repo}{dir ? ` / ${dir}` : ""}</span>
+        <span className="shrink-0 text-[12px] text-muted-foreground">{tree.branch}</span>
+      </div>
+      {tree.truncated && <p className="m-0 px-1 text-[12px] text-muted-foreground">This repository is very large; some files aren't listed.</p>}
+      {err && <p className="m-0 flex items-center gap-1.5 px-1 text-[13px] text-destructive"><AlertTriangle className="!h-4 !w-4" />{err}</p>}
+      <div className="grid max-h-80 gap-0.5 overflow-y-auto">
+        {items.length === 0 && <p className="m-0 p-3 text-center text-[13px] text-muted-foreground">This folder is empty</p>}
+        {items.map((e) => (
+          <button key={e.path} type="button" disabled={!!busy} onClick={() => (e.type === "dir" ? setDir(e.path) : void open(e.path))} className="flex items-center gap-2 rounded-[10px] px-2 py-2 text-left hover:bg-accent">
+            {e.type === "dir" ? <Folder className="!h-4 !w-4 shrink-0 text-primary" /> : <FileText className="!h-4 !w-4 shrink-0 text-muted-foreground" />}
+            <span className="min-w-0 flex-1 truncate text-[14px]">{e.name}</span>
+            {busy === e.path ? <Loader2 className="!h-3.5 !w-3.5 animate-spin" /> : e.size != null && <span className="text-[11px] text-muted-foreground">{e.size.toLocaleString()} B</span>}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
