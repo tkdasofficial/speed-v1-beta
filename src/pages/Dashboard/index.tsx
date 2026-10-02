@@ -131,7 +131,6 @@ function Home({ openProject, openDrawer, prompt, setPrompt, beginTask }: { openP
          <div className="dashboard-mobile-head"><button onClick={openDrawer} aria-label="Open sidebar"><PanelLeft /></button><div className="mobile-brand"><b>SPEED</b></div><Link to="/faq" className="faq-lamp" aria-label="FAQ"><Lightbulb /></Link></div>
 
         <div className="ap-glow ap-glow-home" aria-hidden="true" />
-        <div className="eyebrow"><span className="live-dot" /> SYSTEM READY <span>v1.0</span></div>
         <h1>What are we working<br /><span className="ap-muted">on today?</span></h1>
         <section className="projects-section" aria-labelledby="projects-heading">
           <div className="projects-head"><span id="projects-heading">Projects</span><button>Show all <ChevronRight /></button></div>

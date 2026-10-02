@@ -30,8 +30,6 @@ export function FaqPage() {
     <PageShell title="FAQ">
       <div className="faq-wrap">
         <section className="faq-hero">
-          <span className="faq-eyebrow">Help center</span>
-          <h1>Frequently asked questions</h1>
           <p>Everything you need to know about building with Speed.</p>
           <label className="faq-search">
             <Search />

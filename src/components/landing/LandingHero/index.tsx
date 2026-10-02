@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, ArrowUp, Paperclip } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowUp, Paperclip } from "lucide-react";
 import { useState } from "react";
 
 const ideas = ["Expense tracker", "eSports site", "AI chatbot", "Booking app"];
@@ -12,9 +12,6 @@ export function LandingHero() {
   return (
     <header className="lp-hero">
       <div className="lp-hero-glow" aria-hidden />
-      <Link to="/auth/signup" className="lp-badge">
-        <i />Speed Agent 1.0 is live <ArrowRight />
-      </Link>
       <h1 className="lp-title">
         Build apps at the speed{" "}
 

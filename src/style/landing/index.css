@@ -38,7 +38,7 @@
 .lp-badge:hover { color: var(--foreground); }
 .lp-badge i { width: 7px; height: 7px; border-radius: 99px; background: var(--success); box-shadow: 0 0 0 3px color-mix(in oklab, var(--success) 25%, transparent); }
 .lp-badge svg { width: 14px; height: 14px; }
-.lp-title { margin: 22px 0 0; font-size: clamp(38px, 9vw, 72px); line-height: 1.04; font-weight: 800; letter-spacing: -.035em; }
+.lp-title { margin: 0; font-size: clamp(38px, 9vw, 72px); line-height: 1.04; font-weight: 800; letter-spacing: -.035em; }
 .lp-accent { color: var(--muted-foreground); }
 .lp-sub { margin: 20px 0 0; max-width: 560px; font-size: clamp(16px, 2.2vw, 19px); line-height: 1.55; color: var(--muted-foreground); font-weight: 400; }
 
