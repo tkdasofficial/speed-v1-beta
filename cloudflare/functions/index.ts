@@ -10,8 +10,9 @@ import { AuthError } from "@security/authorize.server";
 import * as auth from "./api/auth";
 import * as sync from "./api/sync";
 import * as github from "./api/github";
+import * as imports from "./api/imports";
 
-const handlers: Record<string, (data: unknown) => Promise<unknown>> = { ...auth, ...sync, ...github } as never;
+const handlers: Record<string, (data: unknown) => Promise<unknown>> = { ...auth, ...sync, ...github, ...imports } as never;
 
 function cors(origin: string | null, env: Env): Record<string, string> {
   if (!isAllowedOrigin(origin, env)) return { Vary: "Origin" };
