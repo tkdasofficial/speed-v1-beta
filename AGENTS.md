@@ -21,7 +21,8 @@
 - Store the uploaded dark and light Speed logo variants as CDN pointers and render them through the shared BrandLogo component; this keeps brand art consistent while adapting to surfaces.
 - Render logo artwork through the square AppIcon component (including BrandLogo) and theme-select its variant; this prevents drawer compression and keeps project icons consistent.
 - Keep account and policy screens UI-only until actual identity and legal copy are supplied; this avoids implying mock sign-out or placeholder legal text is real.
-- Keep signup credentials separate from the UI-only Getting Started profile form; this preserves the mock auth boundary while collecting onboarding details afterward.
+- Backend data lives in Cloudflare D1 (schema in db/schema.sql) reached only from server code via src/lib/d1/d1.server.ts; keeps credentials off the client.
+- Auth is custom: PBKDF2 passwords, hashed session tokens in an HttpOnly cookie, Google/GitHub OAuth via /api/public/auth/start|callback/$provider; no third-party auth service is used.
 - All page top bars render the single global Header component (left / title / right slots, workspace-header sizing); never add page-specific headers, to keep size and behavior identical everywhere.
 - Folder-per-module with index files: page bodies in src/pages/<Name>/index.tsx (page CSS beside it), components in src/components/<Name>/index.tsx, helpers in src/lib/<name>/index.ts; src/routes files stay thin (createFileRoute + head + imported page) because TanStack routing requires them there. shadcn primitives stay flat in src/components/ui.
 - Each page and reusable shell imports its own `src/style/<Name>/index.css`; this keeps style ownership explicit and prevents unrelated page rules from conflicting.
