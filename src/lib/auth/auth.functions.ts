@@ -11,7 +11,7 @@ async function setSession(userId: string) {
 }
 
 export const signUp = createServerFn({ method: "POST" })
-  .inputValidator((d) => creds.parse(d))
+  .validator((d) => creds.parse(d))
   .handler(async ({ data }) => {
     const { d1 } = await import("@/lib/d1/d1.server");
     const { hashPassword } = await import("./auth.server");
@@ -25,7 +25,7 @@ export const signUp = createServerFn({ method: "POST" })
   });
 
 export const signIn = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ email: z.string().trim().toLowerCase().email().max(255), password: z.string().min(1).max(72) }).parse(d))
+  .validator((d) => z.object({ email: z.string().trim().toLowerCase().email().max(255), password: z.string().min(1).max(72) }).parse(d))
   .handler(async ({ data }) => {
     const { d1 } = await import("@/lib/d1/d1.server");
     const { verifyPassword } = await import("./auth.server");
@@ -52,7 +52,7 @@ export const getMe = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const saveProfile = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ fullName: z.string().trim().min(1).max(100), role: z.string().max(40), teamType: z.string().max(40) }).parse(d))
+  .validator((d) => z.object({ fullName: z.string().trim().min(1).max(100), role: z.string().max(40), teamType: z.string().max(40) }).parse(d))
   .handler(async ({ data }) => {
     const { getCookie } = await import("@tanstack/react-start/server");
     const { userFromToken, SESSION_COOKIE } = await import("./auth.server");
