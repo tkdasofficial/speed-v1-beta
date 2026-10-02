@@ -1,4 +1,7 @@
-import { AlertTriangle, Check, Loader2, Smartphone, X } from "lucide-react";
+import { AlertTriangle, Check, Github, Globe, Loader2, Lock, Smartphone, X } from "lucide-react";
+import { oauthStartUrl } from "@/lib/api";
+import { getGithubConnection } from "@/lib/api/auth";
+import { getProjectRepo, githubRepos, linkProjectRepo, unlinkProjectRepo, verifyProjectRepo } from "@/lib/api/github";
 import { useEffect, useState } from "react";
 import type { Task } from "@/lib/workspace-types";
 import { useTasks } from "@/lib/sync";
@@ -26,7 +29,7 @@ export function PreviewView({ hasPreview, projectName, path, reloadKey, onBack }
   );
 }
 
-export function SettingsView({ name, setName, settings, onSettings }: { name: string; setName: (n: string) => void; settings: Record<string, unknown>; onSettings: (s: Record<string, string | boolean>) => void }) {
+export function SettingsView({ projectId, name, setName, settings, onSettings }: { projectId?: string | undefined; name: string; setName: (n: string) => void; settings: Record<string, unknown>; onSettings: (s: Record<string, string | boolean>) => void }) {
   const [draftName, setDraftName] = useState(name);
   useEffect(() => setDraftName(name), [name]);
   const model = typeof settings["model"] === "string" ? (settings["model"] as string) : "Free";
@@ -44,6 +47,7 @@ export function SettingsView({ name, setName, settings, onSettings }: { name: st
           <label className="grid gap-1 text-[12px] text-muted-foreground">Name<input value={draftName} onChange={(e) => setDraftName(e.target.value)} onBlur={() => { if (draftName.trim() && draftName !== name) setName(draftName); }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} className="h-10 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] text-foreground outline-none focus:border-primary" /></label>
           <Seg label="Visibility" value={vis} options={["Private", "Public"]} onChange={setVis} />
         </Section>
+        {projectId && <Section title="GitHub repository"><RepoPicker projectId={projectId} /></Section>}
         <Section title="Model">
           <Seg label="Default model" value={model} options={["Free", "Balanced", "Power"]} onChange={setModel} />
         </Section>
@@ -143,3 +147,73 @@ export function TasksSheet({ onClose, projectId }: { onClose: () => void; projec
 const Btn = ({ children, onClick, primary, danger }: { children: React.ReactNode; onClick: () => void; primary?: boolean; danger?: boolean }) => (
   <button type="button" onClick={onClick} className={`h-8 rounded-[12px] px-3 text-[13px] font-semibold ${primary ? "bg-cta text-cta-foreground" : danger ? "border border-destructive/50 text-destructive" : "border border-border"}`}>{children}</button>
 );
+
+type Repo = Awaited<ReturnType<typeof githubRepos>>[number];
+type Linked = Awaited<ReturnType<typeof getProjectRepo>>;
+const card = "rounded-[14px] border border-border bg-gradient-to-b from-card to-background";
+
+function RepoPicker({ projectId }: { projectId: string }) {
+  const [conn, setConn] = useState<Awaited<ReturnType<typeof getGithubConnection>> | null>(null);
+  const [linked, setLinked] = useState<Linked>(null);
+  const [repos, setRepos] = useState<Repo[] | null>(null);
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const fail = (e: unknown) => setMsg({ ok: false, text: e instanceof Error ? e.message : "Something went wrong" });
+
+  useEffect(() => {
+    void getGithubConnection().then(setConn).catch(fail);
+    void getProjectRepo({ data: { projectId } }).then(setLinked).catch(fail);
+  }, [projectId]);
+
+  const load = async () => { setBusy("load"); setMsg(null); try { setRepos(await githubRepos()); } catch (e) { fail(e); } setBusy(null); };
+  const pick = async (id: number) => { setBusy(`pick${id}`); setMsg(null); try { setLinked(await linkProjectRepo({ data: { projectId, repoId: id } })); setRepos(null); setMsg({ ok: true, text: "Repository connected" }); } catch (e) { fail(e); } setBusy(null); };
+  const verify = async () => {
+    setBusy("verify"); setMsg(null);
+    try { const r = await verifyProjectRepo({ data: { projectId } }); setMsg(r.ok ? { ok: true, text: `Access confirmed${r.canPush ? " — read & write" : " — read only"}` } : { ok: false, text: r.error }); }
+    catch (e) { fail(e); }
+    setBusy(null);
+  };
+  const unlink = async () => { setBusy("unlink"); try { await unlinkProjectRepo({ data: { projectId } }); setLinked(null); setMsg(null); } catch (e) { fail(e); } setBusy(null); };
+
+  if (!conn) return <div className={`${card} flex h-11 items-center gap-2 px-3 text-[13px] text-muted-foreground`}><Loader2 className="!h-4 !w-4 animate-spin" /> Checking GitHub…</div>;
+  if (!conn.connected) {
+    return (
+      <div className={`${card} grid gap-2 p-3`}>
+        <span className="text-[13px] text-muted-foreground">{conn.reconnectRequired ? "Your GitHub access expired. Reconnect to keep using your repositories." : "Connect GitHub to link a repository to this project."}</span>
+        <button type="button" onClick={() => { window.location.href = oauthStartUrl("github"); }} className="flex h-10 items-center justify-center gap-2 rounded-[12px] bg-primary text-[14px] font-semibold text-primary-foreground"><Github className="!h-4 !w-4" />{conn.reconnectRequired ? "Reconnect GitHub" : "Connect GitHub"}</button>
+      </div>
+    );
+  }
+  const shown = (repos ?? []).filter((r) => r.fullName.toLowerCase().includes(q.trim().toLowerCase()));
+  return (
+    <div className="grid gap-2">
+      <div className={`${card} flex items-center gap-2 px-3 py-2.5 text-[14px]`}>
+        <Github className="!h-4 !w-4 shrink-0" />
+        {linked ? <span className="min-w-0 flex-1 truncate font-semibold">{linked.fullName}<span className="ml-2 text-[12px] font-medium text-muted-foreground">{linked.private ? "Private" : "Public"} · {linked.defaultBranch}</span></span>
+          : <span className="min-w-0 flex-1 truncate text-muted-foreground">Signed in as {conn.login} · no repository linked</span>}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => void load()} disabled={!!busy} className="h-9 rounded-[11px] border border-border px-3 text-[13px] font-medium">{busy === "load" ? "Loading…" : linked ? "Change repository" : "Choose repository"}</button>
+        {linked && <button type="button" onClick={() => void verify()} disabled={!!busy} className="h-9 rounded-[11px] border border-border px-3 text-[13px] font-medium">{busy === "verify" ? "Checking…" : "Test access"}</button>}
+        {linked && <button type="button" onClick={() => void unlink()} disabled={!!busy} className="h-9 rounded-[11px] border border-destructive/50 px-3 text-[13px] font-medium text-destructive">Disconnect</button>}
+      </div>
+      {msg && <p className={`m-0 flex items-center gap-1.5 text-[13px] ${msg.ok ? "text-foreground" : "text-destructive"}`}>{msg.ok ? <Check className="!h-4 !w-4 text-primary" /> : <AlertTriangle className="!h-4 !w-4" />}{msg.text}</p>}
+      {repos && (
+        <div className={`${card} grid gap-1 p-2`}>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search repositories" aria-label="Search repositories" className="h-9 rounded-[10px] border border-border bg-background px-3 text-[14px] text-foreground outline-none focus:border-primary" />
+          <div className="grid max-h-72 gap-0.5 overflow-y-auto">
+            {shown.length === 0 && <p className="m-0 p-3 text-center text-[13px] text-muted-foreground">No repositories found</p>}
+            {shown.map((r) => (
+              <button key={r.id} type="button" onClick={() => void pick(r.id)} disabled={!!busy} className="flex items-center gap-2 rounded-[10px] px-2 py-2 text-left hover:bg-accent">
+                {r.private ? <Lock className="!h-3.5 !w-3.5 shrink-0 text-muted-foreground" /> : <Globe className="!h-3.5 !w-3.5 shrink-0 text-muted-foreground" />}
+                <span className="min-w-0 flex-1"><span className="block truncate text-[14px] font-medium">{r.fullName}</span>{r.description && <span className="block truncate text-[12px] text-muted-foreground">{r.description}</span>}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">{busy === `pick${r.id}` ? "…" : r.private ? "Private" : "Public"}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

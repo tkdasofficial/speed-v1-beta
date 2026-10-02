@@ -33,3 +33,4 @@
 - All backend code runs in the standalone `speed-api` Cloudflare Worker (`cloudflare/functions/`, deploy with `bun cloudflare/functions/deploy.ts`); the frontend reaches it only via `VITE_API_URL` through `src/lib/api`, so either side can be re-hosted independently.
 - Sessions are bearer tokens (hash stored in D1, raw token in browser storage) sent as `Authorization`; OAuth start/callback live on the Worker and return the token to an allowed origin's `/auth/oauth` page, so no cross-site cookies are needed.
 - Cloudflare backend rules live in `cloudflare/AGENTS.md`.
+- GitHub API calls go only through `cloudflare/functions/github/client.server.ts` (auto-refreshed, encrypted per-user tokens from `cloudflare/security/github.server.ts`); tokens never leave the Worker.
