@@ -5,14 +5,14 @@ export const SESSION_TTL = 60 * 60 * 24 * 30; // 30 days
 
 const enc = new TextEncoder();
 const b64 = (buf: ArrayBuffer | Uint8Array) => btoa(String.fromCharCode(...new Uint8Array(buf)));
-const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)) as Uint8Array<ArrayBuffer>;
 
 export function randomId(bytes = 16) {
   const a = crypto.getRandomValues(new Uint8Array(bytes));
   return Array.from(a, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function pbkdf2(password: string, salt: Uint8Array, iterations: number) {
+async function pbkdf2(password: string, salt: Uint8Array<ArrayBuffer>, iterations: number) {
   const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
   return crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
 }
