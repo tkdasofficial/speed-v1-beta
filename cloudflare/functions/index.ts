@@ -135,6 +135,15 @@ async function route(req: Request, env: Env): Promise<Response> {
     try { return json({ result: await github.githubRepos() }, 200, h); }
     catch (e) { return json({ error: e instanceof Error ? e.message : "Server error" }, e instanceof AuthError ? e.status : 500, h); }
   }
+  if ((url.pathname === "/api/github/tree" || url.pathname === "/api/github/file") && req.method === "GET") {
+    if (origin && !isAllowedOrigin(origin, env)) return json({ error: "Origin not allowed" }, 403, h);
+    const q = Object.fromEntries(url.searchParams);
+    try { return json({ result: await (url.pathname.endsWith("tree") ? github.githubTree(q) : github.githubFile(q)) }, 200, h); }
+    catch (e) {
+      if (e instanceof ZodError) return json({ error: e.issues[0]?.message ?? "Invalid input" }, 400, h);
+      return json({ error: e instanceof Error ? e.message : "Server error" }, e instanceof AuthError ? e.status : 500, h);
+    }
+  }
   if (url.pathname === "/health") return json({ ok: true }, 200, h);
   return json({ error: "Not found" }, 404, h);
 }
