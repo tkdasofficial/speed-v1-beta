@@ -55,21 +55,21 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
 
        <footer className={`grid shrink-0 gap-2 px-3 pb-[max(8px,env(safe-area-inset-bottom))] pt-1 ${mode === "preview" ? "grid-cols-[minmax(0,1fr)_40px_40px]" : "grid-cols-[40px_minmax(0,1fr)_40px]"}`}>
           {mode === "preview" ? <>
-            <select value={previewPath} onChange={(e) => setPreviewPath(e.target.value)} aria-label="Preview path" className="h-10 min-w-0 rounded-[6px] border border-border bg-card px-3 text-[13px] font-medium text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <select value={previewPath} onChange={(e) => setPreviewPath(e.target.value)} aria-label="Preview path" className="h-10 min-w-0 rounded-[12px] border border-border bg-card px-3 text-[13px] font-medium text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring">
               {["/", "/login", "/dashboard"].map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <Button type="button" variant="outline" size="icon" aria-label="Reload preview" title="Reload preview" onClick={() => setPreviewReload((n) => n + 1)} className="h-10 w-10 rounded-[6px] bg-transparent"><RotateCw className="!h-4 !w-4" /></Button>
+            <Button type="button" variant="outline" size="icon" aria-label="Reload preview" title="Reload preview" onClick={() => setPreviewReload((n) => n + 1)} className="h-10 w-10 rounded-[12px] bg-card font-semibold"><RotateCw className="!h-4 !w-4" /></Button>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild><Button type="button" variant="outline" size="icon" aria-label="More preview options" title="More preview options" className="h-10 w-10 rounded-[6px] bg-transparent"><MoreHorizontal className="!h-4 !w-4" /></Button></DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild><Button type="button" variant="outline" size="icon" aria-label="More preview options" title="More preview options" className="h-10 w-10 rounded-[12px] bg-card font-semibold"><MoreHorizontal className="!h-4 !w-4" /></Button></DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="top" className="border-border bg-card text-foreground">
                 <DropdownMenuItem onSelect={() => setPreviewPath("/")}>Go to home</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setMode("chat")}>Back to chat</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </> : <>
-            <Button type="button" variant="outline" size="icon" aria-label="Tools" title="Tools" onClick={() => setTools(true)} className="h-10 w-10 rounded-[6px] bg-transparent"><Shapes className="!h-4 !w-4" /></Button>
-            <Button type="button" variant="outline" onClick={() => setMode("preview")} className="h-10 min-w-0 truncate rounded-[6px] bg-transparent px-3 text-[14px] font-semibold">Open Preview</Button>
-            <Button type="button" variant="outline" size="icon" aria-label="Tasks" title="Tasks" onClick={() => setTasks(true)} className="h-10 w-10 rounded-[6px] bg-transparent"><ListChecks className="!h-4 !w-4" /></Button>
+            <Button type="button" variant="outline" size="icon" aria-label="Tools" title="Tools" onClick={() => setTools(true)} className="h-10 w-10 rounded-[12px] bg-card font-semibold"><Shapes className="!h-4 !w-4" /></Button>
+            <Button type="button" variant="outline" onClick={() => setMode("preview")} className="h-10 min-w-0 truncate rounded-[12px] border-cta bg-cta px-3 text-[14px] font-bold text-cta-foreground shadow-[0_16px_40px_-20px_var(--primary)] hover:bg-cta/90 hover:text-cta-foreground">Open Preview</Button>
+            <Button type="button" variant="outline" size="icon" aria-label="Tasks" title="Tasks" onClick={() => setTasks(true)} className="h-10 w-10 rounded-[12px] bg-card font-semibold"><ListChecks className="!h-4 !w-4" /></Button>
           </>}
       </footer>
 

@@ -1,5 +1,5 @@
 # Roadmap
 - [x] Auth pages redesign + scroll/gap fix
 - [x] Dashboard & projects redesign
-- [ ] Workspace redesign (agent chat, preview, tools, tasks)
+- [x] Workspace redesign (chat, composer, bottom bar)
 - [ ] Settings & info redesign (settings, account, FAQ, privacy, terms)
