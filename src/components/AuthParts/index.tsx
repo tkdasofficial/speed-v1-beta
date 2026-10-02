@@ -1,7 +1,9 @@
 import { AppIcon } from "@/components/AppIcon";
 import { Button } from "@/components/ui/button";
 
-export const MOCK_USER = { name: "TK Das", email: "demo@speed.dev", password: "speed1234" };
+export function startOAuth(p: "google" | "github") {
+  window.location.href = `/api/public/auth/start/${p}`;
+}
 
 function GoogleMark() {
   return (
