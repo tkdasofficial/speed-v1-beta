@@ -31,14 +31,14 @@ function MockApp({ path, name }: { path: string; name: string }) {
       {path === "/login" ? (
         <div className="grid gap-2 p-5">
           <h3 className="m-0 text-[18px] font-bold">Sign in</h3>
-          <div className="h-10 rounded-[6px] border border-background/20" /><div className="h-10 rounded-[6px] border border-background/20" />
-          <div className="grid h-10 place-items-center rounded-[6px] bg-cta text-[14px] font-semibold text-cta-foreground">Continue</div>
+          <div className="h-10 rounded-[12px] border border-background/20" /><div className="h-10 rounded-[12px] border border-background/20" />
+          <div className="grid h-10 place-items-center rounded-[12px] bg-cta text-[14px] font-semibold text-cta-foreground">Continue</div>
         </div>
       ) : (
         <div className="grid gap-3 p-5">
           <h3 className="m-0 text-[18px] font-bold">{path === "/" ? "Welcome back" : "Dashboard"}</h3>
-          <div className="grid grid-cols-2 gap-2">{["Visitors", "Signups", "Revenue", "Uptime"].map((k, i) => <div key={k} className="rounded-[6px] border border-background/15 p-3"><small className="block text-[11px] opacity-60">{k}</small><b className="text-[16px]">{["1.2k", "86", "$940", "99.9%"][i]}</b></div>)}</div>
-          <div className="h-24 rounded-[6px] bg-background/5" />
+          <div className="grid grid-cols-2 gap-2">{["Visitors", "Signups", "Revenue", "Uptime"].map((k, i) => <div key={k} className="rounded-[12px] border border-background/15 p-3"><small className="block text-[11px] opacity-60">{k}</small><b className="text-[16px]">{["1.2k", "86", "$940", "99.9%"][i]}</b></div>)}</div>
+          <div className="h-24 rounded-[12px] bg-background/5" />
         </div>
       )}
     </div>
@@ -54,7 +54,7 @@ export function SettingsView({ name, setName }: { name: string; setName: (n: str
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto grid max-w-2xl gap-5 p-4">
         <Section title="Project">
-          <label className="grid gap-1 text-[12px] text-muted-foreground">Name<input value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-[6px] border border-border bg-card px-3 text-[14px] text-foreground outline-none focus:border-primary" /></label>
+          <label className="grid gap-1 text-[12px] text-muted-foreground">Name<input value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] text-foreground outline-none focus:border-primary" /></label>
           <Seg label="Visibility" value={vis} options={["Private", "Public"]} onChange={setVis} />
         </Section>
         <Section title="Model">
@@ -65,7 +65,7 @@ export function SettingsView({ name, setName }: { name: string; setName: (n: str
           <Toggle label="Start in Plan mode" on={plan} set={setPlan} />
         </Section>
         <Section title="Danger zone">
-          <button type="button" className="h-10 rounded-[6px] border border-destructive/50 text-[14px] font-semibold text-destructive">Delete project</button>
+          <button type="button" className="h-10 rounded-[12px] border border-destructive/50 text-[14px] font-semibold text-destructive">Delete project</button>
         </Section>
       </div>
     </div>
@@ -73,20 +73,20 @@ export function SettingsView({ name, setName }: { name: string; setName: (n: str
 }
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="grid gap-2"><h3 className="m-0 text-[11px] font-bold uppercase text-muted-foreground">{title}</h3>{children}</section>
+  <section className="grid gap-2"><h3 className="m-0 text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">{title}</h3>{children}</section>
 );
 function Seg({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-[6px] border border-border bg-card p-2 pl-3">
+    <div className="flex items-center justify-between gap-3 rounded-[14px] border border-border bg-gradient-to-b from-card to-background p-2 pl-3">
       <span className="text-[14px]">{label}</span>
-      <div className="flex gap-1">{options.map((o) => <button key={o} type="button" onClick={() => onChange(o)} className={`h-7 rounded-[5px] px-2.5 text-[12px] font-medium ${o === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{o}</button>)}</div>
+      <div className="flex gap-1">{options.map((o) => <button key={o} type="button" onClick={() => onChange(o)} className={`h-7 rounded-[9px] px-2.5 text-[12px] font-medium ${o === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{o}</button>)}</div>
     </div>
   );
 }
 function Toggle({ label, on, set }: { label: string; on: boolean; set: (v: boolean) => void }) {
   return (
-    <button type="button" role="switch" aria-checked={on} onClick={() => set(!on)} className="flex h-11 items-center justify-between rounded-[6px] border border-border bg-card px-3 text-left text-[14px]">
-      {label}<span className={`flex h-5 w-9 items-center rounded-[4px] p-0.5 ${on ? "justify-end bg-primary" : "justify-start bg-accent"}`}><i className="h-4 w-4 rounded-[3px] bg-foreground" /></span>
+    <button type="button" role="switch" aria-checked={on} onClick={() => set(!on)} className="flex h-11 items-center justify-between rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-left text-[14px]">
+      {label}<span className={`flex h-5 w-9 items-center rounded-full p-0.5 ${on ? "justify-end bg-primary" : "justify-start bg-accent"}`}><i className="h-4 w-4 rounded-full bg-foreground" /></span>
     </button>
   );
 }
@@ -94,10 +94,10 @@ function Toggle({ label, on, set }: { label: string; on: boolean; set: (v: boole
 function Empty({ icon: Icon, title, body, action, onAction, tone }: { icon: typeof Check; title: string; body: string; action: string; onAction: () => void; tone?: "destructive" }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
-      <Icon className={`!h-6 !w-6 ${tone ? "text-destructive" : "text-muted-foreground"}`} />
-      <h3 className="mb-1 mt-3 text-[16px] font-semibold">{title}</h3>
+      <span className={`grid h-12 w-12 place-items-center rounded-[12px] border ${tone ? "border-destructive/50 bg-destructive/15 text-destructive" : "border-primary/45 bg-primary/20"}`}><Icon className="!h-5 !w-5" /></span>
+      <h3 className="mb-2 mt-5 text-[24px] font-extrabold tracking-[-0.03em]">{title}</h3>
       <p className="m-0 max-w-xs text-[13px] text-muted-foreground">{body}</p>
-      <button type="button" onClick={onAction} className="mt-4 h-9 rounded-[6px] border border-border px-4 text-[13px] font-semibold">{action}</button>
+      <button type="button" onClick={onAction} className="mt-4 h-9 rounded-[12px] border border-border px-4 text-[13px] font-semibold">{action}</button>
     </div>
   );
 }
@@ -114,8 +114,8 @@ export function TasksSheet({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-background pt-[env(safe-area-inset-top)]">
       <div className="grid h-12 shrink-0 grid-cols-[40px_1fr_40px] items-center border-b border-border px-2">
-        <span /><b className="text-center text-[15px] font-semibold">Tasks</b>
-        <button type="button" aria-label="Close tasks" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-[6px] hover:bg-accent"><X className="!h-5 !w-5" /></button>
+        <span /><b className="text-center text-[15px] font-bold">Tasks</b>
+        <button type="button" aria-label="Close tasks" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-[12px] hover:bg-accent"><X className="!h-5 !w-5" /></button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto grid max-w-2xl gap-5 p-3">
@@ -123,10 +123,10 @@ export function TasksSheet({ onClose }: { onClose: () => void }) {
             const list = tasks.filter((t) => t.status === g.key);
             return (
               <section key={g.key} className="grid gap-1.5">
-                <h3 className="m-0 px-1 text-[11px] font-bold uppercase text-muted-foreground">{g.label} · {list.length}</h3>
-                {list.length === 0 && <p className="m-0 rounded-[6px] border border-dashed border-border p-3 text-[13px] text-muted-foreground">{g.empty}</p>}
+                <h3 className="m-0 px-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">{g.label} · {list.length}</h3>
+                {list.length === 0 && <p className="m-0 rounded-[14px] border border-dashed border-border p-3 text-[13px] text-muted-foreground">{g.empty}</p>}
                 {list.map((t) => (
-                  <div key={t.id} className="grid gap-2 rounded-[6px] border border-border bg-card p-3">
+                  <div key={t.id} className="grid gap-2 rounded-[16px] border border-border bg-gradient-to-b from-card to-background p-4 transition hover:border-foreground/25">
                     <div className="flex items-start gap-2"><div className="min-w-0 flex-1"><b className="block text-[14px] font-semibold">{t.title}</b><small className="block text-[12px] text-muted-foreground">{t.desc}</small></div>
                       {g.key === "active" && <Loader2 className="!h-4 !w-4 animate-spin text-primary" />}</div>
                     {t.progress !== undefined && <div className="h-1 overflow-hidden rounded-[2px] bg-accent"><div className="h-full bg-primary" style={{ width: `${t.progress}%` }} /></div>}
@@ -143,12 +143,12 @@ export function TasksSheet({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <form onSubmit={(e) => { e.preventDefault(); if (!draft.trim()) return; setTasks([...tasks, { id: String(Date.now()), title: draft.trim(), desc: "New draft task", status: "draft" }]); setDraft(""); }} className="flex shrink-0 gap-2 border-t border-border p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-        <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="New task…" className="h-10 min-w-0 flex-1 rounded-[6px] border border-border bg-card px-3 text-[14px] outline-none focus:border-primary" />
-        <button type="submit" disabled={!draft.trim()} className="h-10 rounded-[6px] bg-cta px-4 text-[14px] font-semibold text-cta-foreground disabled:bg-accent disabled:text-muted-foreground">Add</button>
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="New task…" className="h-10 min-w-0 flex-1 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] outline-none focus:border-primary" />
+        <button type="submit" disabled={!draft.trim()} className="h-10 rounded-[12px] bg-cta px-4 text-[14px] font-semibold text-cta-foreground disabled:bg-accent disabled:text-muted-foreground">Add</button>
       </form>
     </div>
   );
 }
 const Btn = ({ children, onClick, primary, danger }: { children: React.ReactNode; onClick: () => void; primary?: boolean; danger?: boolean }) => (
-  <button type="button" onClick={onClick} className={`h-8 rounded-[6px] px-3 text-[13px] font-semibold ${primary ? "bg-cta text-cta-foreground" : danger ? "border border-destructive/50 text-destructive" : "border border-border"}`}>{children}</button>
+  <button type="button" onClick={onClick} className={`h-8 rounded-[12px] px-3 text-[13px] font-semibold ${primary ? "bg-cta text-cta-foreground" : danger ? "border border-destructive/50 text-destructive" : "border border-border"}`}>{children}</button>
 );
