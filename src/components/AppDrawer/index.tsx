@@ -1,12 +1,13 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Bot, ChevronDown, FolderGit2, Import, Layers3, Library, LogOut, MoreHorizontal, PanelLeft, Pin, Plus, Search, Settings, X } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Bot, ChevronDown, CircleHelp, FolderGit2, Import, Layers3, Library, LogOut, MoreHorizontal, PanelLeft, Pin, Plus, Search, Settings, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import "@/style/AppDrawer/index.css";
 
 function BrandMark() {
-  return <div className="brand-mark"><BrandLogo /><b>SPEED</b></div>;
+  return <div className="speed-sidebar__brand"><BrandLogo /><b>SPEED</b></div>;
 }
 
 const allProjects = [
@@ -20,8 +21,16 @@ const allProjects = [
 ];
 const workspaces = ["Personal workspace", "Team workspace"];
 
-function DrawerPanel({ close, setWorkspace, goHome }: { close: () => void; setWorkspace: (name: string) => void; goHome: () => void }) {
+type SidebarPanelProps = {
+  mobile?: boolean;
+  close: () => void;
+  setWorkspace: (name: string) => void;
+  goHome: () => void;
+};
+
+function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPanelProps) {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [projects, setProjects] = useState(allProjects);
   const [pinned, setPinned] = useState<string[]>([]);
   const [menuFor, setMenuFor] = useState<string | null>(null);
@@ -31,42 +40,57 @@ function DrawerPanel({ close, setWorkspace, goHome }: { close: () => void; setWo
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
-  const go = (to: "/import" | "/library" | "/integrations" | "/dashboard") => { close(); navigate({ to }); };
+  const go = (to: "/import" | "/library" | "/integrations" | "/dashboard" | "/faq" | "/settings") => { close(); void navigate({ to }); };
   const list = projects
     .filter((p) => !search || p.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => Number(pinned.includes(b.name)) - Number(pinned.includes(a.name)));
   const togglePin = (name: string) => setPinned((p) => (p.includes(name) ? p.filter((n) => n !== name) : [...p, name]));
 
-  return <div className="drawer-backdrop" onClick={close}><aside className="mobile-drawer" onClick={(e) => e.stopPropagation()}>
+  const panel = <aside className={`speed-sidebar speed-sidebar--${mobile ? "mobile" : "desktop"}`} aria-label="App navigation" onClick={(event) => event.stopPropagation()}>
     {search === null
-      ? <div className="drawer-head"><button className="bare" onClick={() => go("/dashboard")} aria-label="Dashboard"><BrandMark /></button><div><button className="bare" aria-label="Search projects" onClick={() => setSearch("")}><Search /></button><button className="bare" aria-label="Close sidebar" onClick={close}><PanelLeft /></button></div></div>
-      : <div className="drawer-head drawer-head-search"><Search /><input autoFocus className="drawer-search" placeholder="Search projects..." value={search} onChange={(e) => setSearch(e.target.value)} /><button className="bare" aria-label="Close search" onClick={() => setSearch(null)}><X /></button></div>}
-    <div className="ws-wrap">
-      <Button variant="ghost" className="workspace-pill" onClick={() => setWsOpen(!wsOpen)} aria-expanded={wsOpen} aria-label={`Workspace: ${ws}`}><span className="workspace-avatar">{ws === workspaces[0] ? "TK" : "TM"}</span><span className="workspace-name">{ws}</span><ChevronDown /></Button>
-      {wsOpen && <div className="drawer-menu">{workspaces.map((w) => <button key={w} onClick={() => { setWs(w); setWsOpen(false); }}>{w}{w === ws && <span className="model-check">✓</span>}</button>)}</div>}
+      ? <div className="speed-sidebar__header"><Button variant="ghost" className="speed-sidebar__brand" onClick={() => go("/dashboard")} aria-label="Dashboard"><BrandMark /></Button><div className="speed-sidebar__header-actions"><Button variant="ghost" size="icon" className="speed-sidebar__icon" aria-label="Search projects" title="Search projects" onClick={() => setSearch("")}><Search /></Button>{mobile && <Button variant="ghost" size="icon" className="speed-sidebar__icon" aria-label="Close navigation" title="Close navigation" onClick={close}><PanelLeft /></Button>}</div></div>
+      : <div className="speed-sidebar__search-row"><Search /><input autoFocus placeholder="Search projects" value={search} onChange={(event) => setSearch(event.target.value)} /><Button variant="ghost" size="icon" className="speed-sidebar__icon" aria-label="Close search" title="Close search" onClick={() => setSearch(null)}><X /></Button></div>}
+    <div className="speed-sidebar__workspace-wrap">
+      <Button variant="ghost" className="speed-sidebar__workspace" onClick={() => setWsOpen(!wsOpen)} aria-expanded={wsOpen} aria-label={`Workspace: ${ws}`}><span className="speed-sidebar__avatar">{ws === workspaces[0] ? "TK" : "TM"}</span><span className="speed-sidebar__workspace-name">{ws}</span><ChevronDown /></Button>
+      {wsOpen && <div className="speed-sidebar__menu">{workspaces.map((workspace) => <Button variant="ghost" key={workspace} onClick={() => { setWs(workspace); setWsOpen(false); }}>{workspace}{workspace === ws && <span className="model-check">✓</span>}</Button>)}</div>}
     </div>
-    <button className="drawer-new" onClick={() => { goHome(); close(); }}><Plus /> New</button>
-    <nav><button onClick={() => go("/library")}><Library /> Library</button><button onClick={() => go("/import")}><Import /> Import</button><button onClick={() => go("/integrations")}><Layers3 /> Integrations</button></nav>
-    <p className="nav-label">Recent</p>
-    <div className="drawer-recent">{list.length === 0 && <p className="drawer-empty">No projects found</p>}{list.map((p) => <div key={p.name} className="recent-row">
-      <button className="recent-open" onClick={() => setWorkspace(p.name)}>{p.chat ? <Bot /> : <FolderGit2 />}<span>{p.name}</span></button>
-      <button className={`bare ${pinned.includes(p.name) ? "pinned" : ""}`} aria-label="Pin" onClick={() => togglePin(p.name)}><Pin /></button>
-      <button className="bare" aria-label="More" onClick={() => setMenuFor(menuFor === p.name ? null : p.name)}><MoreHorizontal /></button>
-      {menuFor === p.name && <div className="drawer-menu row-menu"><button onClick={() => setWorkspace(p.name)}>Open</button><button onClick={() => { togglePin(p.name); setMenuFor(null); }}>{pinned.includes(p.name) ? "Unpin" : "Pin"}</button><button onClick={() => { setProjects((ps) => ps.filter((x) => x.name !== p.name)); setMenuFor(null); }}>Remove</button></div>}
+    <Button className="speed-sidebar__new" onClick={() => { goHome(); close(); }}><Plus /> New project</Button>
+    <nav className="speed-sidebar__nav" aria-label="Main navigation">
+      <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/dashboard" ? "is-active" : ""}`} onClick={() => go("/dashboard")}><Sparkles /> Agent</Button>
+      <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/library" ? "is-active" : ""}`} onClick={() => go("/library")}><Library /> Library</Button>
+      <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/import" ? "is-active" : ""}`} onClick={() => go("/import")}><Import /> Import</Button>
+      <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/integrations" ? "is-active" : ""}`} onClick={() => go("/integrations")}><Layers3 /> Integrations</Button>
+    </nav>
+    <div className="speed-sidebar__section-head"><span>Recent</span><span>{list.length}</span></div>
+    <div className="speed-sidebar__projects">{list.length === 0 && <p className="speed-sidebar__empty">No projects found</p>}{list.map((project) => <div key={project.name} className="speed-sidebar__project">
+      <Button variant="ghost" className="speed-sidebar__project-open" onClick={() => setWorkspace(project.name)}>{project.chat ? <Bot /> : <FolderGit2 />}<span>{project.name}</span></Button>
+      <Button variant="ghost" size="icon" className={`speed-sidebar__icon speed-sidebar__project-actions ${pinned.includes(project.name) ? "is-pinned" : ""}`} aria-label={`${pinned.includes(project.name) ? "Unpin" : "Pin"} ${project.name}`} title={pinned.includes(project.name) ? "Unpin project" : "Pin project"} onClick={() => togglePin(project.name)}><Pin /></Button>
+      <Button variant="ghost" size="icon" className="speed-sidebar__icon speed-sidebar__project-actions" aria-label={`More options for ${project.name}`} aria-expanded={menuFor === project.name} title="Project options" onClick={() => setMenuFor(menuFor === project.name ? null : project.name)}><MoreHorizontal /></Button>
+      {menuFor === project.name && <div className="speed-sidebar__menu is-project"><Button variant="ghost" onClick={() => setWorkspace(project.name)}>Open</Button><Button variant="ghost" onClick={() => { togglePin(project.name); setMenuFor(null); }}>{pinned.includes(project.name) ? "Unpin" : "Pin"}</Button><Button variant="ghost" onClick={() => { setProjects((current) => current.filter((item) => item.name !== project.name)); setMenuFor(null); }}>Remove</Button></div>}
     </div>)}</div>
-    <div className="ws-wrap account-wrap">
-      {settingsOpen && <div className="drawer-menu up account-menu" aria-label="Account menu">
+    <div className="speed-sidebar__footer">
+      <Button variant="ghost" className="speed-sidebar__utility" onClick={() => go("/faq")}><CircleHelp /> Help</Button>
+      <Button variant="ghost" className="speed-sidebar__utility" onClick={() => go("/settings")}><Settings /> Settings</Button>
+    </div>
+    <div className="speed-sidebar__account-wrap">
+      {settingsOpen && <div className="speed-sidebar__menu is-up" aria-label="Account menu">
         <Button variant="ghost" asChild><Link to="/account" onClick={close}>Account</Link></Button>
         <Button variant="ghost" asChild><Link to="/terms-service" onClick={close}>Terms of Service</Link></Button>
         <Button variant="ghost" asChild><Link to="/privacy-policy" onClick={close}>Privacy Policy</Link></Button>
         <Button variant="ghost" onClick={() => { setSettingsOpen(false); setLogoutOpen(true); }}><LogOut /> Log Out</Button>
       </div>}
-      <div className="drawer-account"><Button variant="ghost" className="drawer-account-trigger" aria-label="Open account menu" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}><span className="account-avatar">TK</span><b>TK Das</b><ChevronDown className={settingsOpen ? "account-chevron is-open" : "account-chevron"} /></Button><Button variant="ghost" size="icon" className="drawer-settings" aria-label="Settings" title="Settings" asChild><Link to="/settings" onClick={close}><Settings /></Link></Button></div>
+      <div className="speed-sidebar__account"><Button variant="ghost" className="speed-sidebar__account-main" aria-label="Open account menu" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}><span className="speed-sidebar__avatar">TK</span><span className="speed-sidebar__account-copy"><b>TK Das</b><small>Personal workspace</small></span><ChevronDown className={settingsOpen ? "is-open" : ""} /></Button><Button variant="ghost" size="icon" className="speed-sidebar__icon" aria-label="Settings" title="Settings" asChild><Link to="/settings" onClick={close}><Settings /></Link></Button></div>
     </div>
     <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Log Out unavailable</AlertDialogTitle><AlertDialogDescription>This preview does not have a signed-in account yet.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogAction>OK</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-  </aside></div>;
+  </aside>;
+
+  return mobile ? <div className="speed-sidebar-backdrop" onClick={close}>{panel}</div> : panel;
 }
 export function AppDrawer({ open, onClose, onNew, onOpenProject }: { open: boolean; onClose: () => void; onNew: () => void; onOpenProject: (name: string) => void }) {
   if (!open) return null;
-  return <DrawerPanel close={onClose} setWorkspace={(name) => { onOpenProject(name); onClose(); }} goHome={onNew} />;
+  return <SidebarPanel mobile close={onClose} setWorkspace={(name) => { onOpenProject(name); onClose(); }} goHome={onNew} />;
+}
+
+export function DesktopSidebar({ onNew, onOpenProject }: { onNew: () => void; onOpenProject: (name: string) => void }) {
+  return <SidebarPanel close={() => {}} setWorkspace={onOpenProject} goHome={onNew} />;
 }
