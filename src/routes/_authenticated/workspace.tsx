@@ -9,5 +9,5 @@ export const Route = createFileRoute("/_authenticated/workspace")({
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
-  beforeLoad: () => { throw redirect({ to: "/project/$projectId", params: { projectId: "websitetoapk" } }); },
+  beforeLoad: () => { throw redirect({ to: "/dashboard" }); },
 });
