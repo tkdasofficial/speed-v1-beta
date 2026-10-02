@@ -1,7 +1,7 @@
 // Speed API — Cloudflare Worker entry. All backend functionality lives here:
 //   POST /rpc/:name             JSON RPC for auth + live data (Authorization: Bearer <session>)
 //   GET  /auth/start/:provider  OAuth start (?return=<allowed frontend origin>)
-//   GET  /auth/callback/:provider
+//   GET  /oauth/:provider/callback  (google, github, gitlab, bitbucket)
 //   POST /stripe/webhook        signature-verified billing events
 //   GET  /health
 import { ZodError } from "zod";
@@ -30,11 +30,11 @@ const b64u = (s: string) => btoa(s).replace(/\+/g, "-").replace(/\//g, "_").repl
 const unb64u = (s: string) => atob(s.replace(/-/g, "+").replace(/_/g, "/"));
 
 async function oauthStart(req: Request, env: Env, p: string) {
-  const { providerConfig, authorizeUrl, callbackUrl } = await import("./oauth");
+  const { providerConfig, authorizeUrl, callbackUrl, isProvider } = await import("./oauth");
   const { randomId } = await import("@security/session.server");
   const ret = new URL(req.url).searchParams.get("return");
   if (!isAllowedOrigin(ret, env)) return new Response("Origin not allowed", { status: 403 });
-  if (p !== "google" && p !== "github") return Response.redirect(`${ret}/auth/login?error=unknown_provider`, 302);
+  if (!isProvider(p)) return Response.redirect(`${ret}/auth/login?error=unknown_provider`, 302);
   const cfg = providerConfig(p);
   if (!cfg) return Response.redirect(`${ret}/auth/login?error=${p}_not_configured`, 302);
   const state = randomId(16);
@@ -42,7 +42,7 @@ async function oauthStart(req: Request, env: Env, p: string) {
     status: 302,
     headers: {
       Location: authorizeUrl(p, cfg.id, callbackUrl(req, p), state),
-      "Set-Cookie": `speed_oauth=${state}.${b64u(ret)}; Path=/auth; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
+      "Set-Cookie": `speed_oauth=${state}.${b64u(ret)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
     },
   });
 }
@@ -53,10 +53,10 @@ async function oauthCallback(req: Request, env: Env, p: string) {
   let origin: string | null = null;
   try { origin = encOrigin ? unb64u(encOrigin) : null; } catch { origin = null; }
   if (!isAllowedOrigin(origin, env)) return new Response("Sign-in expired, please try again", { status: 400 });
-  const clear = "speed_oauth=; Path=/auth; Max-Age=0";
+  const clear = "speed_oauth=; Path=/; Max-Age=0";
   const fail = (msg: string) => new Response(null, { status: 302, headers: { Location: `${origin}/auth/login?error=${encodeURIComponent(msg)}`, "Set-Cookie": clear } });
-  if (p !== "google" && p !== "github") return fail("Unknown provider");
-  const { providerConfig, fetchIdentity, callbackUrl } = await import("./oauth");
+  const { providerConfig, fetchIdentity, callbackUrl, isProvider } = await import("./oauth");
+  if (!isProvider(p)) return fail("Unknown provider");
   const { upsertOAuthUser, createSession, userFromToken } = await import("@security/session.server");
   const cfg = providerConfig(p);
   if (!cfg) return fail(`${p} sign-in is not configured`);
@@ -118,7 +118,7 @@ async function route(req: Request, env: Env): Promise<Response> {
   }
   const start = /^\/auth\/start\/(\w+)$/.exec(url.pathname);
   if (start && req.method === "GET") return oauthStart(req, env, start[1]!);
-  const cb = /^\/auth\/callback\/(\w+)$/.exec(url.pathname);
+  const cb = /^\/oauth\/(\w+)\/callback\/?$/.exec(url.pathname) ?? /^\/auth\/callback\/(\w+)$/.exec(url.pathname);
   if (cb && req.method === "GET") return oauthCallback(req, env, cb[1]!);
   if (url.pathname === "/stripe/webhook" && req.method === "POST") return stripeWebhook(req, env);
   if (url.pathname === "/health") return json({ ok: true }, 200, h);

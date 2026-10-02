@@ -2,7 +2,7 @@
 // Usage: bun cloudflare/secrets-store.ts   — values are read from the environment and never printed.
 // Needs a token with "Secrets Store: Edit" permission.
 export const STORE_NAME = "speed";
-export const STORE_SECRETS = ["SMTP_EMAIL", "SMTP_PASSWORD", "REALTIME_SECRET", "AUTH_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "STRIPE_WEBHOOK_SECRET"];
+export const STORE_SECRETS = ["SMTP_EMAIL", "SMTP_PASSWORD", "REALTIME_SECRET", "AUTH_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "GITLAB_CLIENT_ID", "GITLAB_CLIENT_SECRET", "BITBUCKET_CLIENT_ID", "BITBUCKET_CLIENT_SECRET", "STRIPE_WEBHOOK_SECRET"];
 
 const env = process.env;
 const API = `https://api.cloudflare.com/client/v4/accounts/${env["CLOUDFLARE_ACCOUNT_ID"]}/secrets_store/stores`;
@@ -36,6 +36,12 @@ export async function pushSecrets(storeId: string) {
     pushed.push(name);
   }
   return pushed;
+}
+
+/** Names of every Speed secret currently held in the store. */
+export async function listStored(storeId: string) {
+  const existing = await call<{ name: string }[]>(`${API}/${storeId}/secrets?per_page=100`);
+  return STORE_SECRETS.filter((n) => existing.some((s) => s.name === n));
 }
 
 if (import.meta.main) {
