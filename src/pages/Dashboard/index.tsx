@@ -44,9 +44,8 @@ import {
 import { useState } from "react";
 import { AppDrawer, DesktopSidebar } from "@/components/AppDrawer";
 import { projectSlug } from "@/lib/projects";
-import { useServerFn } from "@tanstack/react-start";
 import { useProjects } from "@/lib/sync";
-import { createProject, sendMessage } from "@/lib/sync/sync.functions";
+import { createProject, sendMessage } from "@/lib/api/sync";
 import "@/style/Dashboard/index.css";
 
 
@@ -76,8 +75,8 @@ export function EvoAgent() {
   const [prompt, setPrompt] = useState("");
   const [running, setRunning] = useState(false);
 
-  const create = useServerFn(createProject);
-  const send = useServerFn(sendMessage);
+  const create = createProject;
+  const send = sendMessage;
   const beginTask = async () => {
     const text = prompt.trim();
     if (!text || running) return;

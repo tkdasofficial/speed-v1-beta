@@ -1,6 +1,7 @@
+import { envStr } from "../backend/context";
 // Records an authoritative change in change_log, then pushes it to the user's
 // relay hub. If the push fails, clients recover the event via changesSince().
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 import type { Entity, EntityMap, SyncEvent } from "./events";
 
 export async function publish<K extends Entity>(userId: string, entity: K, op: "upsert" | "delete", id: string, version: number, data: EntityMap[K] | null) {
@@ -9,8 +10,8 @@ export async function publish<K extends Entity>(userId: string, entity: K, op: "
     [userId, entity, op, id, version, data ? JSON.stringify(data) : null],
   );
   const event = { seq: row!.seq, entity, op, id, version, data } as SyncEvent;
-  const url = process.env["REALTIME_URL"];
-  const secret = process.env["REALTIME_SECRET"];
+  const url = envStr("REALTIME_URL");
+  const secret = envStr("REALTIME_SECRET");
   if (url && secret) {
     try {
       await fetch(`${url}/publish`, {

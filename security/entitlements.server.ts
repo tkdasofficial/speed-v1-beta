@@ -1,6 +1,6 @@
 // Authoritative entitlements derived from the server-side subscriptions table
 // (kept in sync by the verified Stripe webhook). Never derived from client input.
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 
 export type Plan = "free" | "pro";
 export type Entitlements = { plan: Plan; active: boolean; maxProjects: number; periodEnd: number | null };
@@ -23,7 +23,7 @@ export async function assertCanCreateProject(userId: string) {
   const ent = await getEntitlements(userId);
   const [row] = await d1<{ n: number }>("SELECT COUNT(*) AS n FROM projects WHERE owner_id = ?", [userId]);
   if ((row?.n ?? 0) >= ent.maxProjects) {
-    const { sendEmail, emailForUser } = await import("@/lib/email/send.server");
+    const { sendEmail, emailForUser } = await import("@backend/email/send.server");
     const to = await emailForUser(userId);
     if (to) await sendEmail("usage", to, { title: "Project limit reached", body: `You've reached the ${ent.maxProjects}-project limit on your ${ent.plan} plan. Delete a project or upgrade to create more.` },
       { userId, dedupeKey: `limit:projects:${userId}:${ent.plan}:${new Date().toISOString().slice(0, 10)}` });

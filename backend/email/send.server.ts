@@ -1,6 +1,6 @@
 // Single send entry point for every allowed email type. Server-only.
 // Optional dedupeKey makes a send idempotent (recorded in email_log).
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 import { smtpSend } from "./smtp.server";
 import { templates, type TemplateName } from "./templates.server";
 

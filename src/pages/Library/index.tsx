@@ -5,9 +5,8 @@ import { PageShell, SkeletonRows, StateBox } from "@/components/PageShell";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useServerFn } from "@tanstack/react-start";
 import { useProjects } from "@/lib/sync";
-import { createProject, deleteProject, updateProject } from "@/lib/sync/sync.functions";
+import { createProject, deleteProject, updateProject } from "@/lib/api/sync";
 import "@/style/Library/index.css";
 
 
@@ -24,9 +23,9 @@ export function LibraryPage() {
   const live = useProjects();
   const phase: "loading" | "ready" = live ? "ready" : "loading";
   const items = useMemo<Project[]>(() => (live ?? []).map((p) => ({ id: p.id, slug: p.slug, name: p.name, desc: "Agent project", kind: "Web App", modified: Date.parse(`${p.updatedAt.replace(" ", "T")}Z`), status: "Draft" })), [live]);
-  const doCreate = useServerFn(createProject);
-  const doUpdate = useServerFn(updateProject);
-  const doDelete = useServerFn(deleteProject);
+  const doCreate = createProject;
+  const doUpdate = updateProject;
+  const doDelete = deleteProject;
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<Sort>("recent");
   const [kind, setKind] = useState<Kind | "All">("All");

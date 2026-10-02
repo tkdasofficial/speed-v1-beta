@@ -24,13 +24,11 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthOauthRouteImport } from './routes/auth/oauth'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
 import { Route as AuthenticatedProjectProjectIdRouteImport } from './routes/_authenticated/project.$projectId'
-import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
-import { Route as ApiPublicAuthCallbackProviderRouteImport } from './routes/api/public/auth/callback.$provider'
-import { Route as ApiPublicAuthStartProviderRouteImport } from './routes/api/public/auth/start.$provider'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -108,6 +106,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthOauthRoute = AuthOauthRouteImport.update({
+  id: '/auth/oauth',
+  path: '/auth/oauth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/auth/reset-password',
   path: '/auth/reset-password',
@@ -129,23 +132,6 @@ const AuthenticatedProjectProjectIdRoute =
     path: '/project/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe/webhook',
-  path: '/api/public/stripe/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAuthCallbackProviderRoute =
-  ApiPublicAuthCallbackProviderRouteImport.update({
-    id: '/api/public/auth/callback/$provider',
-    path: '/api/public/auth/callback/$provider',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicAuthStartProviderRoute =
-  ApiPublicAuthStartProviderRouteImport.update({
-    id: '/api/public/auth/start/$provider',
-    path: '/api/public/auth/start/$provider',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -162,13 +148,11 @@ export interface FileRoutesByFullPath {
   '/workspace': typeof AuthenticatedWorkspaceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/oauth': typeof AuthOauthRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
-  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -185,13 +169,11 @@ export interface FileRoutesByTo {
   '/workspace': typeof AuthenticatedWorkspaceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/oauth': typeof AuthOauthRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
-  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -210,13 +192,11 @@ export interface FileRoutesById {
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/oauth': typeof AuthOauthRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
-  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -235,13 +215,11 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/oauth'
     | '/auth/reset-password'
     | '/auth/signup'
     | '/auth/verify-email'
     | '/project/$projectId'
-    | '/api/public/stripe/webhook'
-    | '/api/public/auth/callback/$provider'
-    | '/api/public/auth/start/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -258,13 +236,11 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/oauth'
     | '/auth/reset-password'
     | '/auth/signup'
     | '/auth/verify-email'
     | '/project/$projectId'
-    | '/api/public/stripe/webhook'
-    | '/api/public/auth/callback/$provider'
-    | '/api/public/auth/start/$provider'
   id:
     | '__root__'
     | '/'
@@ -282,13 +258,11 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/oauth'
     | '/auth/reset-password'
     | '/auth/signup'
     | '/auth/verify-email'
     | '/_authenticated/project/$projectId'
-    | '/api/public/stripe/webhook'
-    | '/api/public/auth/callback/$provider'
-    | '/api/public/auth/start/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -299,12 +273,10 @@ export interface RootRouteChildren {
   TermsServiceRoute: typeof TermsServiceRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthOauthRoute: typeof AuthOauthRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
-  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
-  ApiPublicAuthCallbackProviderRoute: typeof ApiPublicAuthCallbackProviderRoute
-  ApiPublicAuthStartProviderRoute: typeof ApiPublicAuthStartProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -414,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/oauth': {
+      id: '/auth/oauth'
+      path: '/auth/oauth'
+      fullPath: '/auth/oauth'
+      preLoaderRoute: typeof AuthOauthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/reset-password': {
       id: '/auth/reset-password'
       path: '/auth/reset-password'
@@ -441,27 +420,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$projectId'
       preLoaderRoute: typeof AuthenticatedProjectProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/api/public/stripe/webhook': {
-      id: '/api/public/stripe/webhook'
-      path: '/api/public/stripe/webhook'
-      fullPath: '/api/public/stripe/webhook'
-      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/auth/callback/$provider': {
-      id: '/api/public/auth/callback/$provider'
-      path: '/api/public/auth/callback/$provider'
-      fullPath: '/api/public/auth/callback/$provider'
-      preLoaderRoute: typeof ApiPublicAuthCallbackProviderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/auth/start/$provider': {
-      id: '/api/public/auth/start/$provider'
-      path: '/api/public/auth/start/$provider'
-      fullPath: '/api/public/auth/start/$provider'
-      preLoaderRoute: typeof ApiPublicAuthStartProviderRouteImport
-      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -501,12 +459,10 @@ const rootRouteChildren: RootRouteChildren = {
   TermsServiceRoute: TermsServiceRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthOauthRoute: AuthOauthRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   AuthVerifyEmailRoute: AuthVerifyEmailRoute,
-  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
-  ApiPublicAuthCallbackProviderRoute: ApiPublicAuthCallbackProviderRoute,
-  ApiPublicAuthStartProviderRoute: ApiPublicAuthStartProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

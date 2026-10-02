@@ -1,8 +1,7 @@
 import { Cloud, Database, Figma, Flame, Github, HardDrive, MessageSquare, Triangle, Globe, KeyRound, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { useAppState } from "@/lib/sync";
-import { setState } from "@/lib/sync/sync.functions";
+import { setState } from "@/lib/api/sync";
 import { PageShell, StateBox } from "@/components/PageShell";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import "@/style/Integrations/index.css";
@@ -27,7 +26,7 @@ const label: Record<Status, string> = { idle: "Not connected", connecting: "Conn
 
 export function IntegrationsPage() {
   const saved = useAppState<Record<string, Status>>("integrations", {});
-  const save = useServerFn(setState);
+  const save = setState;
   const items = useMemo(() => seed.map((x) => ({ ...x, status: saved[x.id] ?? x.status })), [saved]);
   const [q, setQ] = useState("");
   const [tab, setTab] = useState<"all" | "mine">("all");

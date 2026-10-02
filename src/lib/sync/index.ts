@@ -1,11 +1,10 @@
 // React hooks over the live, shell-managed query cache.
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { keys } from "@realtime/store";
 import type { Message, Profile, Project, StateEntry, Task } from "@realtime/events";
 import { getConnState, onConnState } from "@shell/index";
-import { listMessages } from "./sync.functions";
+import { listMessages } from "@/lib/api/sync";
 
 const live = { staleTime: Infinity, gcTime: Infinity, refetchOnWindowFocus: false, refetchOnReconnect: false } as const;
 // Data for these keys is written by the shell; the queryFn never runs network.
@@ -31,7 +30,7 @@ export function useAppState<T>(key: string, fallback: T): T {
   return hit ? (hit.value as T) : fallback;
 }
 export function useMessages(projectId: string | undefined) {
-  const fetchMessages = useServerFn(listMessages);
+  const fetchMessages = listMessages;
   return useQuery<Message[]>({
     queryKey: keys.messages(projectId ?? "none"),
     queryFn: () => fetchMessages({ data: { projectId: projectId! } }),

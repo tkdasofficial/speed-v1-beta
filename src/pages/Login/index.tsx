@@ -1,11 +1,10 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AuthHeader, SocialButtons, startOAuth } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-import { signIn } from "@/lib/auth/auth.functions";
+import { signIn } from "@/lib/api/auth";
 
 const schema = z.object({
   email: z.string().trim().email("Enter a valid email").max(255),
@@ -14,7 +13,7 @@ const schema = z.object({
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const doSignIn = useServerFn(signIn);
+  const doSignIn = signIn;
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

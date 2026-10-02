@@ -11,3 +11,4 @@
 - [x] Compact the AppDrawer, consolidate account options, simplify active navigation, and restore Preview text contrast
 - [x] Audit and fix button-label contrast across all pages and workspace panels
 - [x] Security, real-time and App Shell architecture (Stripe keys pending)
+- [x] Move whole backend to a standalone Cloudflare Worker reached via VITE_API_URL (host-independent frontend)

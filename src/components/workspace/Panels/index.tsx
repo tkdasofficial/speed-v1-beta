@@ -1,9 +1,8 @@
 import { AlertTriangle, Check, Loader2, Smartphone, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Task } from "@/lib/workspace-types";
-import { useServerFn } from "@tanstack/react-start";
 import { useTasks } from "@/lib/sync";
-import { createTask, deleteTask, updateTask } from "@/lib/sync/sync.functions";
+import { createTask, deleteTask, updateTask } from "@/lib/api/sync";
 
 export function PreviewView({ hasPreview, projectName, path, reloadKey, onBack }: { hasPreview: boolean; projectName: string; path: string; reloadKey: number; onBack: () => void }) {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
@@ -93,9 +92,9 @@ function Empty({ icon: Icon, title, body, action, onAction, tone }: { icon: type
 export function TasksSheet({ onClose, projectId }: { onClose: () => void; projectId: string | undefined }) {
   const live = useTasks(projectId);
   const tasks: Task[] = live.map((t) => ({ id: t.id, title: t.title, desc: t.description, status: t.status as Task["status"] }));
-  const add = useServerFn(createTask);
-  const upd = useServerFn(updateTask);
-  const del = useServerFn(deleteTask);
+  const add = createTask;
+  const upd = updateTask;
+  const del = deleteTask;
   const [draft, setDraft] = useState("");
   const move = (id: string, status: Task["status"] | null) => void (status ? upd({ data: { id, status } }) : del({ data: { id } }));
   const groups: { key: Task["status"]; label: string; empty: string }[] = [

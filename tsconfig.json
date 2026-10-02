@@ -1,6 +1,6 @@
 {
-  "exclude": ["real-time/worker/**"],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "security/**/*.ts", "real-time/**/*.ts", "shell/**/*.ts", "vite.config.ts", "eslint.config.js"],
+  "exclude": ["real-time/worker/**", "backend/deploy.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "security/**/*.ts", "real-time/**/*.ts", "shell/**/*.ts", "backend/**/*.ts", "vite.config.ts", "eslint.config.js"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -28,7 +28,8 @@
       "@/*": ["./src/*"],
       "@security/*": ["./security/*"],
       "@realtime/*": ["./real-time/*"],
-      "@shell/*": ["./shell/*"]
+      "@shell/*": ["./shell/*"],
+      "@backend/*": ["./backend/*"]
     }
   }
 }

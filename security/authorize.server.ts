@@ -1,15 +1,15 @@
 // Server-side authorization. Every protected server function calls requireUser()
 // and the relevant ownership check; client-side flags are never trusted.
-import { d1 } from "@/lib/d1/d1.server";
-import { SESSION_COOKIE, userFromToken } from "./session.server";
+import { d1 } from "@backend/d1";
+import { userFromToken } from "./session.server";
+import { bearer } from "@backend/context";
 
 export class AuthError extends Error {
   constructor(public status: 401 | 403 | 404, message: string) { super(message); }
 }
 
 export async function currentUser() {
-  const { getCookie } = await import("@tanstack/react-start/server");
-  return userFromToken(getCookie(SESSION_COOKIE));
+  return userFromToken(bearer());
 }
 
 export async function requireUser() {

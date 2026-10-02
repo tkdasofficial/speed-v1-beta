@@ -1,5 +1,5 @@
 // Maps verified Stripe events to billing emails. Server-only; deduped by Stripe event id.
-import { d1 } from "@/lib/d1/d1.server";
+import { d1 } from "@backend/d1";
 import { emailForUser, sendEmail } from "./send.server";
 
 type Ev = { id: string; type: string; data: { object: Record<string, unknown> } };
