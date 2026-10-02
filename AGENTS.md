@@ -21,8 +21,6 @@
 - Store the uploaded dark and light Speed logo variants as CDN pointers and render them through the shared BrandLogo component; this keeps brand art consistent while adapting to surfaces.
 - Render logo artwork through the square AppIcon component (including BrandLogo) and theme-select its variant; this prevents drawer compression and keeps project icons consistent.
 - Keep account and policy screens UI-only until actual identity and legal copy are supplied; this avoids implying mock sign-out or placeholder legal text is real.
-- Backend data lives in Cloudflare D1 (schema in db/schema.sql) reached only from server code via src/lib/d1/d1.server.ts; keeps credentials off the client.
-- Auth is custom: PBKDF2 passwords, hashed session tokens in an HttpOnly cookie, Google/GitHub OAuth via /api/public/auth/start|callback/$provider; no third-party auth service is used.
 - All page top bars render the single global Header component (left / title / right slots, workspace-header sizing); never add page-specific headers, to keep size and behavior identical everywhere.
 - Folder-per-module with index files: page bodies in src/pages/<Name>/index.tsx (page CSS beside it), components in src/components/<Name>/index.tsx, helpers in src/lib/<name>/index.ts; src/routes files stay thin (createFileRoute + head + imported page) because TanStack routing requires them there. shadcn primitives stay flat in src/components/ui.
 - Each page and reusable shell imports its own `src/style/<Name>/index.css`; this keeps style ownership explicit and prevents unrelated page rules from conflicting.
@@ -33,4 +31,7 @@
 - Real-time relay is a Cloudflare Worker + per-user Durable Object (`real-time/worker`, deploy with `bun ./real-time/worker/deploy.ts`); clients join with short-lived HMAC tokens and recover gaps via change_log, so no polling is needed.
 - Protected pages live under `src/routes/_authenticated/`, whose server-side cookie check runs before any protected code or data; the App Shell boots only after it passes.
 - Service Worker only caches build assets and page HTML, never server functions or API routes, and registers only in production builds.
-- All email goes through `src/lib/email/send.server.ts` (Gmail SMTP over TLS, SMTP_EMAIL/SMTP_PASSWORD secrets, server-only); only the allowed notification types in templates.server.ts may be sent, never project-activity emails.
+- All backend code runs in the standalone `speed-api` Cloudflare Worker (`backend/`, deploy with `bun backend/deploy.ts`); the frontend reaches it only via `VITE_API_URL` through `src/lib/api`, so either side can be re-hosted independently.
+- D1 is accessed only through the Worker's native `DB` binding (`backend/d1.ts`); allowed frontend origins come from the `ALLOWED_ORIGINS` Worker variable, never from code.
+- Sessions are bearer tokens (hash stored in D1, raw token in browser storage) sent as `Authorization`; OAuth start/callback live on the Worker and return the token to an allowed origin's `/auth/oauth` page, so no cross-site cookies are needed.
+- All email goes through `backend/email/send.server.ts` (Gmail SMTP, Worker secrets); only the allowed types in templates.server.ts may be sent, never project-activity emails.
