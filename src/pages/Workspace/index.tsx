@@ -68,7 +68,7 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
             </DropdownMenu>
           </> : <>
             <Button type="button" variant="outline" size="icon" aria-label="Tools" title="Tools" onClick={() => setTools(true)} className="h-10 w-10 rounded-[12px] bg-card font-semibold"><Shapes className="!h-4 !w-4" /></Button>
-            <Button type="button" variant="outline" onClick={() => setMode("preview")} className="h-10 min-w-0 truncate rounded-[12px] border-cta bg-cta px-3 text-[14px] font-bold text-foreground shadow-[0_16px_40px_-20px_var(--primary)] hover:bg-foreground hover:text-background">Open Preview</Button>
+            <Button type="button" variant="outline" onClick={() => setMode("preview")} className="h-10 min-w-0 truncate rounded-[12px] border-cta bg-cta px-3 text-[14px] font-bold text-cta-foreground shadow-[0_16px_40px_-20px_var(--primary)] hover:bg-cta/90 hover:text-cta-foreground">Open Preview</Button>
             <Button type="button" variant="outline" size="icon" aria-label="Tasks" title="Tasks" onClick={() => setTasks(true)} className="h-10 w-10 rounded-[12px] bg-card font-semibold"><ListChecks className="!h-4 !w-4" /></Button>
           </>}
       </footer>
