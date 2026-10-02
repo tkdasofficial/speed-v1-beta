@@ -12,8 +12,14 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
         if (!(await verifyStripeSignature(body, request.headers.get("stripe-signature"), secret))) {
           return new Response("Invalid signature", { status: 401 });
         }
-        const event = JSON.parse(body) as { type: string; data: { object: Parameters<typeof applySubscription>[0] } };
-        if (event.type.startsWith("customer.subscription.")) await applySubscription(event.data.object);
+        const event = JSON.parse(body) as { id: string; type: string; data: { object: Record<string, unknown> } };
+        const { notifyBilling } = await import("@/lib/email/billing.server");
+        if (event.type.startsWith("customer.subscription.")) {
+          const userId = await applySubscription(event.data.object as Parameters<typeof applySubscription>[0]);
+          if (userId) await notifyBilling(event, userId);
+        } else if (event.type === "invoice.payment_succeeded" || event.type === "invoice.payment_failed") {
+          await notifyBilling(event, null);
+        }
         return new Response("ok");
       },
     },

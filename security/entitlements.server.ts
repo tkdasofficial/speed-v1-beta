@@ -23,6 +23,10 @@ export async function assertCanCreateProject(userId: string) {
   const ent = await getEntitlements(userId);
   const [row] = await d1<{ n: number }>("SELECT COUNT(*) AS n FROM projects WHERE owner_id = ?", [userId]);
   if ((row?.n ?? 0) >= ent.maxProjects) {
+    const { sendEmail, emailForUser } = await import("@/lib/email/send.server");
+    const to = await emailForUser(userId);
+    if (to) await sendEmail("usage", to, { title: "Project limit reached", body: `You've reached the ${ent.maxProjects}-project limit on your ${ent.plan} plan. Delete a project or upgrade to create more.` },
+      { userId, dedupeKey: `limit:projects:${userId}:${ent.plan}:${new Date().toISOString().slice(0, 10)}` });
     const { AuthError } = await import("./authorize.server");
     throw new AuthError(403, `Your ${ent.plan} plan allows ${ent.maxProjects} projects`);
   }
