@@ -1,5 +1,4 @@
 // Live-data server functions: validate → authorize → write D1 → publish delta.
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import * as v from "@security/validation";
 import type { Json, Message, Profile, Project, Snapshot, StateEntry, Task } from "@realtime/events";
@@ -17,7 +16,7 @@ type TRow = { id: string; project_id: string; title: string; description: string
 const toTask = (r: TRow): Task => ({ id: r.id, projectId: r.project_id, title: r.title, description: r.description, status: r.status, version: r.version });
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "project";
 
-export const getSnapshot = createServerFn({ method: "GET" }).handler(async (): Promise<Snapshot> => {
+export async function getSnapshot(): Promise<Snapshot> {
   const { me, d1 } = await ctx();
   const { latestSeq } = await import("@realtime/publish.server");
   const seq = await latestSeq(me.id);
@@ -34,34 +33,32 @@ export const getSnapshot = createServerFn({ method: "GET" }).handler(async (): P
     profile: { email: me.email, displayName: me.display_name, avatarUrl: me.avatar_url, version: prof[0]?.version ?? 1 },
     state: state.map((s) => ({ key: s.key, value: JSON.parse(s.value), version: s.version })),
   };
-});
+}
 
-export const getChangesSince = createServerFn({ method: "GET" })
-  .inputValidator((d) => v.since.parse(d))
-  .handler(async ({ data }) => {
+export async function getChangesSince(raw: unknown) {
+    const data = v.since.parse(raw);
     const { me } = await ctx();
     const { changesSince } = await import("@realtime/publish.server");
     return changesSince(me.id, data.seq);
-  });
+}
 
-export const getRealtimeTicket = createServerFn({ method: "POST" }).handler(async () => {
+export async function getRealtimeTicket() {
   const { me } = await ctx();
   const { mintRealtimeToken } = await import("@security/realtime-token.server");
   const url = process.env["REALTIME_URL"];
   if (!url) throw new Error("Real-time is not configured");
   return { url, token: await mintRealtimeToken(me.id) };
-});
+}
 
-export const getEntitlementsFn = createServerFn({ method: "GET" }).handler(async () => {
+export async function getEntitlementsFn() {
   const { me } = await ctx();
   const { getEntitlements } = await import("@security/entitlements.server");
   return getEntitlements(me.id);
-});
+}
 
 // Projects
-export const createProject = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.projectCreate.parse(d))
-  .handler(async ({ data }) => {
+export async function createProject(raw: unknown) {
+    const data = v.projectCreate.parse(raw);
     const { me, d1, publish } = await ctx();
     const { assertCanCreateProject } = await import("@security/entitlements.server");
     await assertCanCreateProject(me.id);
@@ -76,11 +73,10 @@ export const createProject = createServerFn({ method: "POST" })
     const p = toProject(row!);
     await publish(me.id, "project", "upsert", p.id, p.version, p);
     return p;
-  });
+}
 
-export const updateProject = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.projectUpdate.parse(d))
-  .handler(async ({ data }) => {
+export async function updateProject(raw: unknown) {
+    const data = v.projectUpdate.parse(raw);
     const { me, d1, publish } = await ctx();
     const [cur] = await d1<PRow>("SELECT id, slug, name, settings, updated_at, version FROM projects WHERE id = ? AND owner_id = ?", [data.id, me.id]);
     if (!cur) throw new Error("Project not found");
@@ -92,22 +88,20 @@ export const updateProject = createServerFn({ method: "POST" })
     const p = toProject(row!);
     await publish(me.id, "project", "upsert", p.id, p.version, p);
     return p;
-  });
+}
 
-export const deleteProject = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ id: v.id }).parse(d))
-  .handler(async ({ data }) => {
+export async function deleteProject(raw: unknown) {
+    const data = z.object({ id: v.id }).parse(raw);
     const { me, d1, publish } = await ctx();
     const rows = await d1<{ version: number }>("DELETE FROM projects WHERE id = ? AND owner_id = ? RETURNING version", [data.id, me.id]);
     if (!rows[0]) throw new Error("Project not found");
     await publish(me.id, "project", "delete", data.id, rows[0].version + 1, null);
     return { ok: true };
-  });
+}
 
 // Messages
-export const listMessages = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ projectId: v.id }).parse(d))
-  .handler(async ({ data }): Promise<Message[]> => {
+export async function listMessages(raw: unknown): Promise<Message[]> {
+    const data = z.object({ projectId: v.id }).parse(raw);
     const { me, d1 } = await ctx();
     const { assertOwnsProject } = await import("@security/authorize.server");
     await assertOwnsProject(me.id, data.projectId);
@@ -116,11 +110,10 @@ export const listMessages = createServerFn({ method: "GET" })
       [data.projectId],
     );
     return rows.map((r) => ({ id: r.id, projectId: data.projectId, role: r.role, content: r.content, createdAt: r.created_at, version: 1 }));
-  });
+}
 
-export const sendMessage = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.messageCreate.parse(d))
-  .handler(async ({ data }) => {
+export async function sendMessage(raw: unknown) {
+    const data = v.messageCreate.parse(raw);
     const { me, d1, publish } = await ctx();
     const { assertOwnsProject } = await import("@security/authorize.server");
     await assertOwnsProject(me.id, data.projectId);
@@ -132,12 +125,11 @@ export const sendMessage = createServerFn({ method: "POST" })
     const m: Message = { id: row!.id, projectId: data.projectId, role: "user", content: data.content, createdAt: row!.created_at, version: 1 };
     await publish(me.id, "message", "upsert", m.id, 1, m);
     return m;
-  });
+}
 
 // Tasks
-export const createTask = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.taskCreate.parse(d))
-  .handler(async ({ data }) => {
+export async function createTask(raw: unknown) {
+    const data = v.taskCreate.parse(raw);
     const { me, d1, publish } = await ctx();
     const { assertOwnsProject } = await import("@security/authorize.server");
     await assertOwnsProject(me.id, data.projectId);
@@ -148,11 +140,10 @@ export const createTask = createServerFn({ method: "POST" })
     const t = toTask(row!);
     await publish(me.id, "task", "upsert", t.id, t.version, t);
     return t;
-  });
+}
 
-export const updateTask = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.taskUpdate.parse(d))
-  .handler(async ({ data }) => {
+export async function updateTask(raw: unknown) {
+    const data = v.taskUpdate.parse(raw);
     const { me, d1, publish } = await ctx();
     const { assertOwnsTask } = await import("@security/authorize.server");
     await assertOwnsTask(me.id, data.id);
@@ -164,23 +155,21 @@ export const updateTask = createServerFn({ method: "POST" })
     const t = toTask(row!);
     await publish(me.id, "task", "upsert", t.id, t.version, t);
     return t;
-  });
+}
 
-export const deleteTask = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ id: v.id }).parse(d))
-  .handler(async ({ data }) => {
+export async function deleteTask(raw: unknown) {
+    const data = z.object({ id: v.id }).parse(raw);
     const { me, d1, publish } = await ctx();
     const { assertOwnsTask } = await import("@security/authorize.server");
     await assertOwnsTask(me.id, data.id);
     const [row] = await d1<{ version: number }>("DELETE FROM ai_tasks WHERE id = ? RETURNING version", [data.id]);
     await publish(me.id, "task", "delete", data.id, (row?.version ?? 0) + 1, null);
     return { ok: true };
-  });
+}
 
 // Profile
-export const updateProfile = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.profileUpdate.parse(d))
-  .handler(async ({ data }) => {
+export async function updateProfile(raw: unknown) {
+    const data = v.profileUpdate.parse(raw);
     const { me, d1, publish } = await ctx();
     const [row] = await d1<{ display_name: string | null; avatar_url: string | null; version: number }>(
       `UPDATE profiles SET display_name = COALESCE(?, display_name), avatar_url = CASE WHEN ? THEN ? ELSE avatar_url END,
@@ -190,12 +179,11 @@ export const updateProfile = createServerFn({ method: "POST" })
     const p: Profile = { email: me.email, displayName: row!.display_name, avatarUrl: row!.avatar_url, version: row!.version };
     await publish(me.id, "profile", "upsert", me.id, p.version, p);
     return p;
-  });
+}
 
 // Generic per-user UI/app state (tool state, imports, integrations…)
-export const setState = createServerFn({ method: "POST" })
-  .inputValidator((d) => v.stateSet.parse(d))
-  .handler(async ({ data }) => {
+export async function setState(raw: unknown) {
+    const data = v.stateSet.parse(raw);
     const { me, d1, publish } = await ctx();
     const value = JSON.stringify(data.value ?? null);
     if (value.length > 20000) throw new Error("Value too large");
@@ -208,4 +196,4 @@ export const setState = createServerFn({ method: "POST" })
     const s: StateEntry = { key: data.key, value: JSON.parse(value) as Json, version: row!.version };
     await publish(me.id, "state", "upsert", data.key, s.version, s);
     return s;
-  });
+}
