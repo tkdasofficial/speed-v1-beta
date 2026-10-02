@@ -12,6 +12,9 @@ const built = await Bun.build({ entrypoints: [`${import.meta.dir}/index.ts`], ta
 if (!built.success) throw new Error("Build failed");
 const code = await built.outputs[0]!.text();
 
+const { ensureStore, pushSecrets } = await import("../../secrets-store");
+const storeId = await ensureStore();
+await pushSecrets(storeId);
 const existing = await fetch(`${API}/scripts/${NAME}/settings`, { headers: auth });
 const fresh = existing.status === 404;
 const metadata = {
@@ -19,7 +22,7 @@ const metadata = {
   compatibility_date: "2025-01-01",
   bindings: [
     { type: "durable_object_namespace", name: "HUB", class_name: "UserHub" },
-    { type: "secret_text", name: "REALTIME_SECRET", text: secret },
+    { type: "secrets_store_secret", name: "REALTIME_SECRET", store_id: storeId, secret_name: "REALTIME_SECRET" },
   ],
   ...(fresh ? { migrations: { new_tag: "v1", new_sqlite_classes: ["UserHub"] } } : {}),
 };

@@ -24,7 +24,10 @@ const built = await Bun.build({
 if (!built.success) throw new Error(`Build failed: ${built.logs.join("\n")}`);
 const code = await built.outputs[0]!.text();
 
-const secrets = ["SMTP_EMAIL", "SMTP_PASSWORD", "REALTIME_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "STRIPE_WEBHOOK_SECRET"];
+// Secrets come only from the Cloudflare Secrets Store (pushed first, then bound by name).
+const { ensureStore, pushSecrets } = await import("../secrets-store");
+const storeId = await ensureStore();
+const stored = await pushSecrets(storeId);
 const metadata = {
   main_module: "index.js",
   compatibility_date: "2025-09-01",
@@ -33,7 +36,7 @@ const metadata = {
     { type: "d1", name: "DB", id: env["CLOUDFLARE_D1_DATABASE_ID"] },
     { type: "plain_text", name: "REALTIME_URL", text: env["REALTIME_URL"] },
     { type: "plain_text", name: "ALLOWED_ORIGINS", text: env["ALLOWED_ORIGINS"] },
-    ...secrets.filter((k) => env[k]).map((k) => ({ type: "secret_text", name: k, text: env[k] })),
+    ...stored.map((k) => ({ type: "secrets_store_secret", name: k, store_id: storeId, secret_name: k })),
   ],
 };
 const form = new FormData();

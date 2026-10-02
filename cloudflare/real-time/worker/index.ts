@@ -4,7 +4,7 @@
 
 interface Env {
   HUB: DurableObjectNamespace;
-  REALTIME_SECRET: string;
+  REALTIME_SECRET: { get(): Promise<string> };
 }
 type DurableObjectNamespace = { idFromName(n: string): unknown; get(id: unknown): { fetch(r: Request): Promise<Response> } };
 type DOState = {
@@ -35,15 +35,16 @@ async function verifyToken(token: string, secret: string): Promise<string | null
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
+    const SECRET = await env.REALTIME_SECRET.get();
     const url = new URL(req.url);
     if (url.pathname === "/connect") {
       if (req.headers.get("Upgrade") !== "websocket") return new Response("Expected websocket", { status: 426 });
-      const uid = await verifyToken(url.searchParams.get("token") ?? "", env.REALTIME_SECRET);
+      const uid = await verifyToken(url.searchParams.get("token") ?? "", SECRET);
       if (!uid) return new Response("Unauthorized", { status: 401 });
       return env.HUB.get(env.HUB.idFromName(uid)).fetch(new Request("https://hub/connect", req));
     }
     if (url.pathname === "/publish" && req.method === "POST") {
-      if (req.headers.get("Authorization") !== `Bearer ${env.REALTIME_SECRET}`) return new Response("Unauthorized", { status: 401 });
+      if (req.headers.get("Authorization") !== `Bearer ${SECRET}`) return new Response("Unauthorized", { status: 401 });
       const body = (await req.json()) as { userId?: string; events?: unknown[] };
       if (!body.userId || !Array.isArray(body.events)) return new Response("Bad request", { status: 400 });
       return env.HUB.get(env.HUB.idFromName(body.userId)).fetch(
