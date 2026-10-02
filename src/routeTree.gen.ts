@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as TermsServiceRouteImport } from './routes/terms-service'
@@ -33,6 +34,10 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -49,46 +54,46 @@ const TermsServiceRoute = TermsServiceRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
-  id: '/_authenticated/account',
+  id: '/account',
   path: '/account',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/_authenticated/dashboard',
+  id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedGettingStartedRoute =
   AuthenticatedGettingStartedRouteImport.update({
-    id: '/_authenticated/getting-started',
+    id: '/getting-started',
     path: '/getting-started',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedImportRoute = AuthenticatedImportRouteImport.update({
-  id: '/_authenticated/import',
+  id: '/import',
   path: '/import',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedIntegrationsRoute =
   AuthenticatedIntegrationsRouteImport.update({
-    id: '/_authenticated/integrations',
+    id: '/integrations',
     path: '/integrations',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
-  id: '/_authenticated/library',
+  id: '/library',
   path: '/library',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/_authenticated/settings',
+  id: '/settings',
   path: '/settings',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
-  id: '/_authenticated/workspace',
+  id: '/workspace',
   path: '/workspace',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/auth/forgot-password',
@@ -107,9 +112,9 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
 } as any)
 const AuthenticatedProjectProjectIdRoute =
   AuthenticatedProjectProjectIdRouteImport.update({
-    id: '/_authenticated/project/$projectId',
+    id: '/project/$projectId',
     path: '/project/$projectId',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApiPublicAuthCallbackProviderRoute =
   ApiPublicAuthCallbackProviderRouteImport.update({
@@ -167,6 +172,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/faq': typeof FaqRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/terms-service': typeof TermsServiceRoute
@@ -229,6 +235,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/faq'
     | '/privacy-policy'
     | '/terms-service'
@@ -250,21 +257,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   FaqRoute: typeof FaqRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   TermsServiceRoute: typeof TermsServiceRoute
-  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedGettingStartedRoute: typeof AuthenticatedGettingStartedRoute
-  AuthenticatedImportRoute: typeof AuthenticatedImportRoute
-  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
-  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
-  AuthenticatedProjectProjectIdRoute: typeof AuthenticatedProjectProjectIdRoute
   ApiPublicAuthCallbackProviderRoute: typeof ApiPublicAuthCallbackProviderRoute
   ApiPublicAuthStartProviderRoute: typeof ApiPublicAuthStartProviderRoute
 }
@@ -276,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -304,56 +310,56 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/getting-started': {
       id: '/_authenticated/getting-started'
       path: '/getting-started'
       fullPath: '/getting-started'
       preLoaderRoute: typeof AuthenticatedGettingStartedRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/import': {
       id: '/_authenticated/import'
       path: '/import'
       fullPath: '/import'
       preLoaderRoute: typeof AuthenticatedImportRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/integrations': {
       id: '/_authenticated/integrations'
       path: '/integrations'
       fullPath: '/integrations'
       preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/library': {
       id: '/_authenticated/library'
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/workspace': {
       id: '/_authenticated/workspace'
       path: '/workspace'
       fullPath: '/workspace'
       preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/auth/forgot-password': {
       id: '/auth/forgot-password'
@@ -381,7 +387,7 @@ declare module '@tanstack/react-router' {
       path: '/project/$projectId'
       fullPath: '/project/$projectId'
       preLoaderRoute: typeof AuthenticatedProjectProjectIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/auth/callback/$provider': {
       id: '/api/public/auth/callback/$provider'
@@ -400,11 +406,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  FaqRoute: FaqRoute,
-  PrivacyPolicyRoute: PrivacyPolicyRoute,
-  TermsServiceRoute: TermsServiceRoute,
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGettingStartedRoute: typeof AuthenticatedGettingStartedRoute
+  AuthenticatedImportRoute: typeof AuthenticatedImportRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRoute
+  AuthenticatedProjectProjectIdRoute: typeof AuthenticatedProjectProjectIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedGettingStartedRoute: AuthenticatedGettingStartedRoute,
@@ -413,10 +427,21 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRoute,
+  AuthenticatedProjectProjectIdRoute: AuthenticatedProjectProjectIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  FaqRoute: FaqRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  TermsServiceRoute: TermsServiceRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
-  AuthenticatedProjectProjectIdRoute: AuthenticatedProjectProjectIdRoute,
   ApiPublicAuthCallbackProviderRoute: ApiPublicAuthCallbackProviderRoute,
   ApiPublicAuthStartProviderRoute: ApiPublicAuthStartProviderRoute,
 }
