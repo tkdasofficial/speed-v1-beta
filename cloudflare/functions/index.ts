@@ -9,8 +9,9 @@ import { als, isAllowedOrigin, type Env } from "./context";
 import { AuthError } from "@security/authorize.server";
 import * as auth from "./api/auth";
 import * as sync from "./api/sync";
+import * as github from "./api/github";
 
-const handlers: Record<string, (data: unknown) => Promise<unknown>> = { ...auth, ...sync } as never;
+const handlers: Record<string, (data: unknown) => Promise<unknown>> = { ...auth, ...sync, ...github } as never;
 
 function cors(origin: string | null, env: Env): Record<string, string> {
   if (!isAllowedOrigin(origin, env)) return { Vary: "Origin" };
@@ -129,6 +130,11 @@ async function route(req: Request, env: Env): Promise<Response> {
   const cb = /^\/oauth\/(\w+)\/callback\/?$/.exec(url.pathname) ?? /^\/auth\/callback\/(\w+)$/.exec(url.pathname);
   if (cb && req.method === "GET") return oauthCallback(req, env, cb[1]!);
   if (url.pathname === "/stripe/webhook" && req.method === "POST") return stripeWebhook(req, env);
+  if (url.pathname === "/api/github/repos" && req.method === "GET") {
+    if (origin && !isAllowedOrigin(origin, env)) return json({ error: "Origin not allowed" }, 403, h);
+    try { return json({ result: await github.githubRepos() }, 200, h); }
+    catch (e) { return json({ error: e instanceof Error ? e.message : "Server error" }, e instanceof AuthError ? e.status : 500, h); }
+  }
   if (url.pathname === "/health") return json({ ok: true }, 200, h);
   return json({ error: "Not found" }, 404, h);
 }
