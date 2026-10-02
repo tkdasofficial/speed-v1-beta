@@ -49,8 +49,8 @@ export async function createSession(userId: string) {
 
 export async function userFromToken(token: string | undefined) {
   if (!token) return null;
-  const rows = await d1<{ id: string; email: string; display_name: string | null; avatar_url: string | null; onboarded: number }>(
-    `SELECT u.id, u.email, p.display_name, p.avatar_url, COALESCE(p.onboarded,0) AS onboarded
+  const rows = await d1<{ id: string; email: string; email_verified: number; display_name: string | null; avatar_url: string | null; onboarded: number }>(
+    `SELECT u.id, u.email, u.email_verified, p.display_name, p.avatar_url, COALESCE(p.onboarded,0) AS onboarded
      FROM sessions s JOIN users u ON u.id = s.user_id LEFT JOIN profiles p ON p.user_id = u.id
      WHERE s.id = ? AND s.expires_at > ?`,
     [await sha256(token), Math.floor(Date.now() / 1000)],

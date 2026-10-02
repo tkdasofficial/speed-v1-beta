@@ -12,6 +12,10 @@ export const Route = createFileRoute("/_authenticated")({
     const me = cached ?? (await getMe());
     if (me) context.queryClient.setQueryData(["me"], me);
     if (!me) throw redirect({ to: "/auth/login", search: { redirect: location.href } as never });
+    if (!me.email_verified) {
+      context.queryClient.removeQueries({ queryKey: ["me"] });
+      throw redirect({ to: "/auth/verify-email" });
+    }
     return { me };
   },
   component: AuthenticatedShell,
