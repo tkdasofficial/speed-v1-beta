@@ -45,6 +45,14 @@ function fail(res: Response, label: string): never {
 export async function publicMeta(ref: RepoRef): Promise<RepoMeta> {
   if (ref.provider === "github") {
     const res = await get(`https://api.github.com/repos/${ref.path}`, { headers: { Accept: "application/vnd.github+json" } });
+    // The anonymous API is often rate-limited on shared server IPs; the public archive host
+    // still proves public access (it returns 404 for private repos), so fall back to it.
+    if (res.status === 403 || res.status === 429) {
+      const head = await get(`https://codeload.github.com/${ref.path}/zip/HEAD`, { method: "HEAD" });
+      if (head.status === 404) throw new ImportError(404, "GitHub repository not found, or it is private");
+      if (!head.ok) fail(res, "GitHub");
+      return { ...ref, fullName: ref.path, defaultBranch: "HEAD", private: false, url: `https://github.com/${ref.path}`, empty: false };
+    }
     if (!res.ok) fail(res, "GitHub");
     const r = (await res.json()) as { id: number; full_name: string; default_branch: string; private: boolean; html_url: string; size: number; owner: { login: string }; name: string };
     if (r.private) throw new ImportError(403, "This repository is private — connect GitHub to import it");
@@ -87,7 +95,7 @@ async function readCapped(res: Response): Promise<Uint8Array> {
 /** Downloads the default-branch ZIP of a public repository. */
 export async function publicArchive(m: RepoMeta): Promise<Uint8Array> {
   const b = encodeURIComponent(m.defaultBranch);
-  const url = m.provider === "github" ? `https://codeload.github.com/${m.path}/zip/refs/heads/${b}`
+  const url = m.provider === "github" ? `https://codeload.github.com/${m.path}/zip/${m.defaultBranch === "HEAD" ? "HEAD" : `refs/heads/${b}`}`
     : m.provider === "gitlab" ? `https://gitlab.com/api/v4/projects/${encodeURIComponent(m.path)}/repository/archive.zip?sha=${b}`
     : `https://bitbucket.org/${m.path}/get/${b}.zip`;
   const res = await get(url);
