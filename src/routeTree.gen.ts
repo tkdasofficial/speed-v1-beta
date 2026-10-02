@@ -24,6 +24,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthOauthRouteImport } from './routes/auth/oauth'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
@@ -105,6 +106,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthOauthRoute = AuthOauthRouteImport.update({
+  id: '/auth/oauth',
+  path: '/auth/oauth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/auth/reset-password',
   path: '/auth/reset-password',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/workspace': typeof AuthenticatedWorkspaceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/oauth': typeof AuthOauthRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/workspace': typeof AuthenticatedWorkspaceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/oauth': typeof AuthOauthRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/oauth': typeof AuthOauthRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/oauth'
     | '/auth/reset-password'
     | '/auth/signup'
     | '/auth/verify-email'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/oauth'
     | '/auth/reset-password'
     | '/auth/signup'
     | '/auth/verify-email'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/oauth'
     | '/auth/reset-password'
     | '/auth/signup'
     | '/auth/verify-email'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   TermsServiceRoute: typeof TermsServiceRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthOauthRoute: typeof AuthOauthRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
@@ -373,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/oauth': {
+      id: '/auth/oauth'
+      path: '/auth/oauth'
+      fullPath: '/auth/oauth'
+      preLoaderRoute: typeof AuthOauthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/reset-password': {
       id: '/auth/reset-password'
       path: '/auth/reset-password'
@@ -439,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsServiceRoute: TermsServiceRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthOauthRoute: AuthOauthRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   AuthVerifyEmailRoute: AuthVerifyEmailRoute,
