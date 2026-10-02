@@ -64,7 +64,7 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
       <main className="flex min-h-0 flex-1 flex-col">
         {mode === "chat" && <ChatView items={items} onSend={onSend} />}
          {mode === "preview" && <PreviewView hasPreview={hasPreview} projectName={name} path={previewPath} reloadKey={previewReload} onBack={() => setMode("chat")} />}
-        {mode === "settings" && <SettingsView name={name} setName={setName} settings={project?.settings ?? {}} onSettings={(s) => { if (project) void rename({ data: { id: project.id, settings: s } }); }} />}
+        {mode === "settings" && <SettingsView projectId={project?.id} name={name} setName={setName} settings={project?.settings ?? {}} onSettings={(s) => { if (project) void rename({ data: { id: project.id, settings: s } }); }} />}
       </main>
 
        <footer className={`grid shrink-0 gap-2 px-3 pb-[max(8px,env(safe-area-inset-bottom))] pt-1 ${mode === "preview" ? "grid-cols-[minmax(0,1fr)_40px_40px]" : "grid-cols-[40px_minmax(0,1fr)_40px]"}`}>
