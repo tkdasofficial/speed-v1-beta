@@ -75,7 +75,7 @@ export function ChatView({ items, setItems }: { items: ChatItem[]; setItems: Rea
       </div>
       <div className="relative shrink-0 px-3 pb-2 pt-1">
         {!atBottom && items.length > 0 && (
-          <button type="button" onClick={() => { toBottom(); setAtBottom(true); }} className="absolute -top-11 left-1/2 flex h-8 -translate-x-1/2 items-center gap-1.5 rounded-[6px] border border-border bg-card px-3 text-[13px] font-medium">
+          <button type="button" onClick={() => { toBottom(); setAtBottom(true); }} className="absolute -top-11 left-1/2 flex h-8 -translate-x-1/2 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-[13px] font-semibold shadow-lg">
             <ArrowDown className="!h-4 !w-4" /> Scroll to latest
           </button>
         )}
@@ -90,7 +90,7 @@ function Item({ item }: { item: ChatItem }) {
     case "user":
       return (
         <div className="grid justify-items-end gap-1">
-          <div className="max-w-[85%] whitespace-pre-wrap rounded-[6px] bg-primary px-3 py-2.5 text-[15px] leading-6 text-primary-foreground">{item.text}</div>
+          <div className="max-w-[85%] whitespace-pre-wrap rounded-[16px] rounded-br-[6px] bg-primary px-4 py-2.5 shadow-[0_16px_40px_-22px_var(--primary)] text-[15px] leading-6 text-primary-foreground">{item.text}</div>
           <span className="text-[11px] text-muted-foreground">{item.time}</span>
         </div>
       );
@@ -108,7 +108,7 @@ function Item({ item }: { item: ChatItem }) {
     }
     case "checkpoint":
       return (
-        <div className="flex h-9 items-center gap-2 rounded-[6px] border border-border px-2.5 text-[13px] text-muted-foreground">
+        <div className="flex h-10 items-center gap-2 rounded-[12px] border border-border bg-gradient-to-b from-card to-background px-3 text-[13px] text-muted-foreground">
           <CheckCircle2 className="!h-4 !w-4" /> {item.text}
           <button type="button" className="ml-auto text-[12px] font-semibold text-foreground hover:underline">Rollback</button>
         </div>
@@ -118,13 +118,14 @@ function Item({ item }: { item: ChatItem }) {
 
 function EmptyChat({ onPick }: { onPick: (t: string) => void }) {
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col items-center justify-center px-6 py-10 text-center">
-      <div className="grid h-11 w-11 place-items-center rounded-[8px] border border-border bg-card"><Bot className="!h-5 !w-5" /></div>
-      <h2 className="mb-1 mt-4 text-[18px] font-semibold">New chat with Agent</h2>
-      <p className="m-0 text-[14px] text-muted-foreground">Describe what to build or change. The agent reads your project, makes edits and tests them.</p>
-      <div className="mt-6 grid w-full gap-1.5">
+    <div className="relative mx-auto flex min-h-full max-w-md flex-col items-center justify-center overflow-hidden px-6 py-10 text-center">
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-[10%] h-[320px] w-[140%] -translate-x-1/2 bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--primary)_30%,transparent),transparent_70%)] blur-[10px]" />
+      <div className="relative grid h-12 w-12 place-items-center rounded-[12px] border border-primary/45 bg-primary/20"><Bot className="!h-5 !w-5" /></div>
+      <h2 className="relative mb-2 mt-5 text-[26px] font-extrabold leading-tight tracking-[-0.03em]">New chat with Agent</h2>
+      <p className="relative m-0 text-[15px] leading-relaxed text-muted-foreground">Describe what to build or change. The agent reads your project, makes edits and tests them.</p>
+      <div className="relative mt-7 grid w-full gap-2">
         {suggestions.map((s) => (
-          <button key={s} type="button" onClick={() => onPick(s)} className="flex h-10 items-center rounded-[6px] border border-border bg-card px-3 text-left text-[14px] font-medium hover:border-primary">{s}</button>
+          <button key={s} type="button" onClick={() => onPick(s)} className="flex h-12 items-center rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-4 text-left text-[14px] font-semibold transition hover:-translate-y-0.5 hover:border-primary">{s}</button>
         ))}
       </div>
     </div>

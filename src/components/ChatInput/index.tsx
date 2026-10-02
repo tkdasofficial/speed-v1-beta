@@ -33,7 +33,7 @@ export function ChatInput({ onSend, busy, onStop, value, onChange, placeholder =
   const canSend = !!text.trim() && !busy;
 
   return (
-    <div className="rounded-[8px] border border-border bg-card p-2.5">
+    <div className="rounded-[18px] border border-border bg-card p-3 shadow-[0_24px_60px_-36px_var(--primary)] transition focus-within:border-primary/60">
       <textarea
         ref={ref}
         rows={2}
