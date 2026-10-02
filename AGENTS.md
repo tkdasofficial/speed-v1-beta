@@ -34,3 +34,4 @@
 - Sessions are bearer tokens (hash stored in D1, raw token in browser storage) sent as `Authorization`; OAuth start/callback live on the Worker and return the token to an allowed origin's `/auth/oauth` page, so no cross-site cookies are needed.
 - Cloudflare backend rules live in `cloudflare/AGENTS.md`.
 - GitHub API calls go only through `cloudflare/functions/github/client.server.ts` (auto-refreshed, encrypted per-user tokens from `cloudflare/security/github.server.ts`); tokens never leave the Worker.
+- Every import source (GitHub, GitLab, Bitbucket, ZIP, folder) goes through `cloudflare/functions/import/normalize.ts` into the existing `files` table of a new project (`api/imports.ts`), and imports only report success after the saved file count is checked; one file format, no fake progress.

@@ -15,7 +15,6 @@ type PRow = { id: string; slug: string; name: string; settings: string; updated_
 const toProject = (r: PRow): Project => ({ id: r.id, slug: r.slug, name: r.name, settings: JSON.parse(r.settings || "{}"), updatedAt: r.updated_at, version: r.version });
 type TRow = { id: string; project_id: string; title: string; description: string; status: string; version: number };
 const toTask = (r: TRow): Task => ({ id: r.id, projectId: r.project_id, title: r.title, description: r.description, status: r.status, version: r.version });
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "project";
 
 export async function getSnapshot(): Promise<Snapshot> {
   const { me, d1 } = await ctx();
@@ -60,20 +59,9 @@ export async function getEntitlementsFn() {
 // Projects
 export async function createProject(raw: unknown) {
     const data = v.projectCreate.parse(raw);
-    const { me, d1, publish } = await ctx();
-    const { assertCanCreateProject } = await import("@security/entitlements.server");
-    await assertCanCreateProject(me.id);
-    const base = slugify(data.name);
-    const taken = new Set((await d1<{ slug: string }>("SELECT slug FROM projects WHERE owner_id = ? AND slug LIKE ?", [me.id, `${base}%`])).map((r) => r.slug));
-    let slug = base;
-    for (let i = 2; taken.has(slug); i++) slug = `${base}-${i}`;
-    const [row] = await d1<PRow>(
-      "INSERT INTO projects (id, owner_id, slug, name) VALUES (?, ?, ?, ?) RETURNING id, slug, name, settings, updated_at, version",
-      [crypto.randomUUID(), me.id, slug, data.name],
-    );
-    const p = toProject(row!);
-    await publish(me.id, "project", "upsert", p.id, p.version, p);
-    return p;
+    const { me } = await ctx();
+    const { insertProject } = await import("@backend/projects.server");
+    return insertProject(me.id, data.name);
 }
 
 export async function updateProject(raw: unknown) {

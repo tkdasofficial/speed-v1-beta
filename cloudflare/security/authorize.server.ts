@@ -5,7 +5,7 @@ import { userFromToken } from "./session.server";
 import { bearer } from "@backend/context";
 
 export class AuthError extends Error {
-  constructor(public status: 401 | 403 | 404, message: string) { super(message); }
+  constructor(public status: number, message: string) { super(message); }
 }
 
 export async function currentUser() {
