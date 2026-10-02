@@ -1,6 +1,7 @@
 .home-page { overflow-x: hidden; }
 .home-inner { position: relative; }
 .home-inner > :not(.ap-glow) { position: relative; z-index: 1; }
+.home-page .ap-glow { position: absolute; left: 50%; top: -120px; width: min(900px, 140vw); height: 420px; transform: translateX(-50%); pointer-events: none; z-index: 0; background: radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--primary) 30%, transparent), transparent 70%); filter: blur(10px); }
 .ap-glow-home { top: -180px; height: 520px; }
 .home-page h1 { font-weight: 800; line-height: 1.02; }
 .home-page .projects-head span { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
