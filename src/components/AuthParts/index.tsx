@@ -1,8 +1,9 @@
+import { oauthStartUrl } from "@/lib/api";
 import { AppIcon } from "@/components/AppIcon";
 import { Button } from "@/components/ui/button";
 
 export function startOAuth(p: "google" | "github") {
-  window.location.href = `/api/public/auth/start/${p}`;
+  window.location.href = oauthStartUrl(p);
 }
 
 function GoogleMark() {
