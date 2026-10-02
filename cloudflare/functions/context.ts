@@ -3,7 +3,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
 export interface D1Stmt { bind(...v: unknown[]): D1Stmt; all<T>(): Promise<{ results?: T[] }> }
-export interface D1Database { prepare(sql: string): D1Stmt }
+export interface D1Database { prepare(sql: string): D1Stmt; batch(stmts: D1Stmt[]): Promise<unknown[]> }
 
 export type Env = {
   DB: D1Database;
