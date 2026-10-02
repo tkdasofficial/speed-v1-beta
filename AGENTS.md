@@ -25,3 +25,4 @@
 - All page top bars render the single global Header component (left / title / right slots, workspace-header sizing); never add page-specific headers, to keep size and behavior identical everywhere.
 - Folder-per-module with index files: page bodies in src/pages/<Name>/index.tsx (page CSS beside it), components in src/components/<Name>/index.tsx, helpers in src/lib/<name>/index.ts; src/routes files stay thin (createFileRoute + head + imported page) because TanStack routing requires them there. shadcn primitives stay flat in src/components/ui.
 - Landing page sections live in src/components/landing/<Name>/index.tsx and its styles in src/style/landing/index.css (scoped .lp- classes); keeps the landing self-contained from app styles.
+- Auth screens (login, signup, forgot password, getting started) render inside the shared AuthShell component with styles in src/style/auth/index.css (scoped .au- classes); keeps sign-in styling consistent with the landing.
