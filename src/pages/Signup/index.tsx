@@ -37,7 +37,7 @@ export function SignupPage() {
     try {
       const res = await doSignUp({ data: r.data });
       if (!res.ok) { setBusy(false); return setError(res.error); }
-      navigate({ to: "/getting-started" });
+      navigate({ to: "/auth/verify-email" });
     } catch {
       setBusy(false);
       setError("Something went wrong. Try again.");

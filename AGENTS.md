@@ -33,3 +33,4 @@
 - Real-time relay is a Cloudflare Worker + per-user Durable Object (`real-time/worker`, deploy with `bun ./real-time/worker/deploy.ts`); clients join with short-lived HMAC tokens and recover gaps via change_log, so no polling is needed.
 - Protected pages live under `src/routes/_authenticated/`, whose server-side cookie check runs before any protected code or data; the App Shell boots only after it passes.
 - Service Worker only caches build assets and page HTML, never server functions or API routes, and registers only in production builds.
+- All email goes through `src/lib/email/send.server.ts` (Gmail SMTP over TLS, SMTP_EMAIL/SMTP_PASSWORD secrets, server-only); only the allowed notification types in templates.server.ts may be sent, never project-activity emails.

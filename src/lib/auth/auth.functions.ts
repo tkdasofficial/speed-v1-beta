@@ -21,18 +21,107 @@ export const signUp = createServerFn({ method: "POST" })
     await d1("INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)", [id, data.email, await hashPassword(data.password)]);
     await d1("INSERT INTO profiles (user_id) VALUES (?)", [id]);
     await setSession(id);
+    const { issueVerifyCode } = await import("@/lib/email/send.server");
+    await issueVerifyCode(id, data.email);
     return { ok: true as const };
   });
+
+async function requestMeta() {
+  const { getRequestHeader } = await import("@tanstack/react-start/server");
+  const ip = getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const agent = (getRequestHeader("user-agent") ?? "unknown").slice(0, 160);
+  return { ip, agent };
+}
 
 export const signIn = createServerFn({ method: "POST" })
   .validator((d) => z.object({ email: z.string().trim().toLowerCase().email().max(255), password: z.string().min(1).max(72) }).parse(d))
   .handler(async ({ data }) => {
     const { d1 } = await import("@/lib/d1/d1.server");
     const { verifyPassword } = await import("@security/session.server");
-    const rows = await d1<{ id: string; password_hash: string | null }>("SELECT id, password_hash FROM users WHERE email = ?", [data.email]);
+    const rows = await d1<{ id: string; email: string; password_hash: string | null; email_verified: number }>("SELECT id, email, password_hash, email_verified FROM users WHERE email = ?", [data.email]);
     const u = rows[0];
     if (!u?.password_hash || !(await verifyPassword(data.password, u.password_hash))) return { ok: false as const, error: "Incorrect email or password" };
     await setSession(u.id);
+    if (u.email_verified) {
+      const { sendEmail, nowText } = await import("@/lib/email/send.server");
+      await sendEmail("loginAlert", u.email, { when: nowText(), ...(await requestMeta()) }, { userId: u.id });
+    }
+    return { ok: true as const, verified: !!u.email_verified };
+  });
+
+async function sessionUser() {
+  const { currentUser } = await import("@security/authorize.server");
+  return currentUser();
+}
+
+export const verifyEmail = createServerFn({ method: "POST" })
+  .validator((d) => z.object({ code: z.string().regex(/^\d{8}$/, "Enter the 8-digit code") }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await sessionUser();
+    if (!me) return { ok: false as const, error: "Please log in again" };
+    if (me.email_verified) return { ok: true as const };
+    const { d1 } = await import("@/lib/d1/d1.server");
+    const { hashCode } = await import("@/lib/email/send.server");
+    const now = Math.floor(Date.now() / 1000);
+    const [row] = await d1<{ id: string; code_hash: string; attempts: number; expires_at: number }>(
+      "SELECT id, code_hash, attempts, expires_at FROM email_codes WHERE user_id = ? AND purpose = 'verify' ORDER BY created_at DESC LIMIT 1", [me.id]);
+    if (!row || row.expires_at < now) return { ok: false as const, error: "This code has expired. Send a new one." };
+    if (row.attempts >= 5) return { ok: false as const, error: "Too many attempts. Send a new code." };
+    if (row.code_hash !== (await hashCode(data.code))) {
+      await d1("UPDATE email_codes SET attempts = attempts + 1 WHERE id = ?", [row.id]);
+      return { ok: false as const, error: "That code isn't right" };
+    }
+    await d1("UPDATE users SET email_verified = 1 WHERE id = ?", [me.id]);
+    await d1("DELETE FROM email_codes WHERE user_id = ? AND purpose = 'verify'", [me.id]);
+    return { ok: true as const };
+  });
+
+export const resendVerifyCode = createServerFn({ method: "POST" }).handler(async () => {
+  const me = await sessionUser();
+  if (!me) return { ok: false as const, error: "Please log in again" };
+  if (me.email_verified) return { ok: true as const };
+  const { issueVerifyCode } = await import("@/lib/email/send.server");
+  return issueVerifyCode(me.id, me.email);
+});
+
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .validator((d) => z.object({ email: z.string().trim().toLowerCase().email().max(255) }).parse(d))
+  .handler(async ({ data }) => {
+    const { d1 } = await import("@/lib/d1/d1.server");
+    const { hashCode, sendEmail } = await import("@/lib/email/send.server");
+    const { randomId } = await import("@security/session.server");
+    const { getRequestUrl } = await import("@tanstack/react-start/server");
+    const [u] = await d1<{ id: string; email: string }>("SELECT id, email FROM users WHERE email = ?", [data.email]);
+    const now = Math.floor(Date.now() / 1000);
+    if (u) {
+      const recent = await d1<{ n: number }>("SELECT COUNT(*) AS n FROM email_codes WHERE user_id = ? AND purpose = 'reset' AND created_at > ?", [u.id, now - 60]);
+      if (!(recent[0]?.n)) {
+        const token = randomId(32);
+        await d1("DELETE FROM email_codes WHERE user_id = ? AND purpose = 'reset'", [u.id]);
+        await d1("INSERT INTO email_codes (id, user_id, purpose, code_hash, expires_at, created_at) VALUES (?, ?, 'reset', ?, ?, ?)",
+          [crypto.randomUUID(), u.id, await hashCode(token), now + 30 * 60, now]);
+        const url = `${getRequestUrl().origin}/auth/reset-password?token=${token}`;
+        await sendEmail("passwordReset", u.email, { url }, { userId: u.id });
+      }
+    }
+    return { ok: true as const }; // same response whether or not the account exists
+  });
+
+export const resetPassword = createServerFn({ method: "POST" })
+  .validator((d) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/), password: z.string().min(8).max(72) }).parse(d))
+  .handler(async ({ data }) => {
+    const { d1 } = await import("@/lib/d1/d1.server");
+    const { hashCode, sendEmail, nowText } = await import("@/lib/email/send.server");
+    const { hashPassword } = await import("@security/session.server");
+    const now = Math.floor(Date.now() / 1000);
+    const [row] = await d1<{ user_id: string; email: string }>(
+      "SELECT c.user_id, u.email FROM email_codes c JOIN users u ON u.id = c.user_id WHERE c.purpose = 'reset' AND c.code_hash = ? AND c.expires_at > ?",
+      [await hashCode(data.token), now]);
+    if (!row) return { ok: false as const, error: "This reset link is invalid or has expired" };
+    await d1("UPDATE users SET password_hash = ?, email_verified = 1 WHERE id = ?", [await hashPassword(data.password), row.user_id]);
+    await d1("DELETE FROM email_codes WHERE user_id = ? AND purpose = 'reset'", [row.user_id]);
+    await d1("DELETE FROM sessions WHERE user_id = ?", [row.user_id]);
+    await sendEmail("accountSecurity", row.email, { change: "Your Speed password was changed and all devices were signed out.", when: nowText() }, { userId: row.user_id });
     return { ok: true as const };
   });
 
