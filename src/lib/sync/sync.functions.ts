@@ -2,7 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import * as v from "@security/validation";
-import type { Message, Profile, Project, Snapshot, StateEntry, Task } from "@realtime/events";
+import type { Json, Message, Profile, Project, Snapshot, StateEntry, Task } from "@realtime/events";
 
 async function ctx() {
   const { requireUser } = await import("@security/authorize.server");
@@ -205,7 +205,7 @@ export const setState = createServerFn({ method: "POST" })
        RETURNING version`,
       [me.id, data.key, value],
     );
-    const s: StateEntry = { key: data.key, value: data.value ?? null, version: row!.version };
+    const s: StateEntry = { key: data.key, value: JSON.parse(value) as Json, version: row!.version };
     await publish(me.id, "state", "upsert", data.key, s.version, s);
     return s;
   });
