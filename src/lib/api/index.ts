@@ -35,4 +35,4 @@ export function endpoint<F extends Handler>(name: string) {
 }
 
 export const oauthStartUrl = (provider: "google" | "github") =>
-  `${API_URL}/auth/start/${provider}?return=${encodeURIComponent(window.location.origin)}`;
+  `${API_URL}/oauth/${provider}?return=${encodeURIComponent(window.location.origin)}`;

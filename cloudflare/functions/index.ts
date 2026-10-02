@@ -61,18 +61,26 @@ async function oauthCallback(req: Request, env: Env, p: string) {
   const cfg = providerConfig(p);
   if (!cfg) return fail(`${p} sign-in is not configured`);
   const url = new URL(req.url);
+  const denied = url.searchParams.get("error");
+  if (denied) return fail(denied === "access_denied" ? "GitHub authorization was cancelled" : "Sign-in failed");
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   if (!code || !state || state !== cookieState) return fail("Sign-in expired, please try again");
   try {
     const who = await fetchIdentity(p, code, callbackUrl(req, p), cfg);
     const userId = await upsertOAuthUser(p, who.id, who.email, who.name, who.avatar);
+    if (p === "github" && who.tokens) {
+      const { saveGithubTokens } = await import("@security/github.server");
+      await saveGithubTokens(userId, who.id, who.login ?? "", who.tokens);
+    }
     const token = await createSession(userId);
     const me = await userFromToken(token);
     const next = me?.onboarded ? "/dashboard" : "/getting-started";
     return new Response(null, { status: 302, headers: { Location: `${origin}/auth/oauth#token=${token}&next=${encodeURIComponent(next)}`, "Set-Cookie": clear } });
   } catch (e) {
-    return fail(e instanceof Error ? e.message : "Sign-in failed");
+    const msg = e instanceof Error ? e.message : "Sign-in failed";
+    console.error(`[oauth] ${p} callback failed`); // never log codes or tokens
+    return fail(/D1|SQL/i.test(msg) ? "Could not save your account, please try again" : msg);
   }
 }
 
@@ -116,7 +124,7 @@ async function route(req: Request, env: Env): Promise<Response> {
       return json({ error: e instanceof Error ? e.message : "Server error" }, 500, h);
     }
   }
-  const start = /^\/auth\/start\/(\w+)$/.exec(url.pathname);
+  const start = /^\/auth\/start\/(\w+)$/.exec(url.pathname) ?? /^\/oauth\/(\w+)\/?$/.exec(url.pathname);
   if (start && req.method === "GET") return oauthStart(req, env, start[1]!);
   const cb = /^\/oauth\/(\w+)\/callback\/?$/.exec(url.pathname) ?? /^\/auth\/callback\/(\w+)$/.exec(url.pathname);
   if (cb && req.method === "GET") return oauthCallback(req, env, cb[1]!);
