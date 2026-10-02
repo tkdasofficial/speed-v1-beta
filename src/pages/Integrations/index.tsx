@@ -1,5 +1,8 @@
 import { Cloud, Database, Figma, Flame, Github, HardDrive, MessageSquare, Triangle, Globe, KeyRound, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useAppState } from "@/lib/sync";
+import { setState } from "@/lib/sync/sync.functions";
 import { PageShell, StateBox } from "@/components/PageShell";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import "@/style/Integrations/index.css";
@@ -23,13 +26,15 @@ const cats: (Cat | "All")[] = ["All", "Development", "Design", "Storage", "Datab
 const label: Record<Status, string> = { idle: "Not connected", connecting: "Connecting…", connected: "Connected", auth: "Authentication required", error: "Connection error" };
 
 export function IntegrationsPage() {
-  const [items, setItems] = useState(seed);
+  const saved = useAppState<Record<string, Status>>("integrations", {});
+  const save = useServerFn(setState);
+  const items = useMemo(() => seed.map((x) => ({ ...x, status: saved[x.id] ?? x.status })), [saved]);
   const [q, setQ] = useState("");
   const [tab, setTab] = useState<"all" | "mine">("all");
   const [cat, setCat] = useState<Cat | "All">("All");
   const [detail, setDetail] = useState<string | null>(null);
 
-  const set = (id: string, status: Status) => setItems((xs) => xs.map((x) => (x.id === id ? { ...x, status } : x)));
+  const set = (id: string, status: Status) => void save({ data: { key: "integrations", value: { ...saved, [id]: status } } });
   const connect = (id: string) => { set(id, "connecting"); setTimeout(() => set(id, id === "firebase" && Math.random() < 0.5 ? "error" : "connected"), 1200); };
   const list = useMemo(() => { const s = q.trim().toLowerCase(); return items.filter((i) => (tab === "all" || i.status === "connected") && (cat === "All" || i.cat === cat) && (!s || `${i.name} ${i.desc} ${i.cat}`.toLowerCase().includes(s))); }, [items, q, tab, cat]);
   const mine = items.filter((i) => i.status === "connected").length;
