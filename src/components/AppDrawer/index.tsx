@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Bot, ChevronDown, CircleHelp, FolderGit2, Import, Layers3, Library, LogOut, MoreHorizontal, PanelLeft, Pin, Plus, Search, Settings, Sparkles, X } from "lucide-react";
+import { Bot, ChevronDown, CircleHelp, FolderGit2, Import, Layers3, Library, LogOut, MoreHorizontal, PanelLeft, Pin, Plus, Search, Settings, X } from "lucide-react";
 import { useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPa
     </div>
     <Button className="speed-sidebar__new" onClick={() => { goHome(); close(); }}><Plus /> New project</Button>
     <nav className="speed-sidebar__nav" aria-label="Main navigation">
-      <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/dashboard" ? "is-active" : ""}`} onClick={() => go("/dashboard")}><Sparkles /> Agent</Button>
+      <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/dashboard" ? "is-active" : ""}`} onClick={() => go("/dashboard")}>Agent</Button>
       <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/library" ? "is-active" : ""}`} onClick={() => go("/library")}><Library /> Library</Button>
       <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/import" ? "is-active" : ""}`} onClick={() => go("/import")}><Import /> Import</Button>
       <Button variant="ghost" className={`speed-sidebar__nav-button ${pathname === "/integrations" ? "is-active" : ""}`} onClick={() => go("/integrations")}><Layers3 /> Integrations</Button>
@@ -68,18 +68,16 @@ function SidebarPanel({ mobile = false, close, setWorkspace, goHome }: SidebarPa
       <Button variant="ghost" size="icon" className="speed-sidebar__icon speed-sidebar__project-actions" aria-label={`More options for ${project.name}`} aria-expanded={menuFor === project.name} title="Project options" onClick={() => setMenuFor(menuFor === project.name ? null : project.name)}><MoreHorizontal /></Button>
       {menuFor === project.name && <div className="speed-sidebar__menu is-project"><Button variant="ghost" onClick={() => setWorkspace(project.name)}>Open</Button><Button variant="ghost" onClick={() => { togglePin(project.name); setMenuFor(null); }}>{pinned.includes(project.name) ? "Unpin" : "Pin"}</Button><Button variant="ghost" onClick={() => { setProjects((current) => current.filter((item) => item.name !== project.name)); setMenuFor(null); }}>Remove</Button></div>}
     </div>)}</div>
-    <div className="speed-sidebar__footer">
-      <Button variant="ghost" className="speed-sidebar__utility" onClick={() => go("/faq")}><CircleHelp /> Help</Button>
-      <Button variant="ghost" className="speed-sidebar__utility" onClick={() => go("/settings")}><Settings /> Settings</Button>
-    </div>
     <div className="speed-sidebar__account-wrap">
       {settingsOpen && <div className="speed-sidebar__menu is-up" aria-label="Account menu">
+        <Button variant="ghost" onClick={() => go("/faq")}><CircleHelp /> Help</Button>
+        <Button variant="ghost" onClick={() => go("/settings")}><Settings /> Settings</Button>
         <Button variant="ghost" asChild><Link to="/account" onClick={close}>Account</Link></Button>
         <Button variant="ghost" asChild><Link to="/terms-service" onClick={close}>Terms of Service</Link></Button>
         <Button variant="ghost" asChild><Link to="/privacy-policy" onClick={close}>Privacy Policy</Link></Button>
         <Button variant="ghost" onClick={() => { setSettingsOpen(false); setLogoutOpen(true); }}><LogOut /> Log Out</Button>
       </div>}
-      <div className="speed-sidebar__account"><Button variant="ghost" className="speed-sidebar__account-main" aria-label="Open account menu" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}><span className="speed-sidebar__avatar">TK</span><span className="speed-sidebar__account-copy"><b>TK Das</b><small>Personal workspace</small></span><ChevronDown className={settingsOpen ? "is-open" : ""} /></Button><Button variant="ghost" size="icon" className="speed-sidebar__icon" aria-label="Settings" title="Settings" asChild><Link to="/settings" onClick={close}><Settings /></Link></Button></div>
+      <div className="speed-sidebar__account"><Button variant="ghost" className="speed-sidebar__account-main" aria-label="Open account menu" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}><span className="speed-sidebar__avatar">TK</span><span className="speed-sidebar__account-copy"><b>TK Das</b><small>Personal workspace</small></span><ChevronDown className={settingsOpen ? "is-open" : ""} /></Button></div>
     </div>
     <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Log Out unavailable</AlertDialogTitle><AlertDialogDescription>This preview does not have a signed-in account yet.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogAction>OK</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </aside>;
