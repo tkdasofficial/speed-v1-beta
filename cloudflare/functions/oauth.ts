@@ -27,7 +27,7 @@ export function authorizeUrl(p: Provider, clientId: string, redirect: string, st
   }
 }
 
-type Identity = { id: string; email: string; name?: string; avatar?: string };
+type Identity = { id: string; email: string; name?: string | undefined; avatar?: string | undefined };
 const form = (o: Record<string, string>) => new URLSearchParams(o);
 
 export async function fetchIdentity(p: Provider, code: string, redirect: string, cfg: { id: string; secret: string }): Promise<Identity> {
