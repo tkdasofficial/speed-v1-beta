@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/public/auth/callback/$provider")({
     handlers: {
       GET: async ({ request, params }) => {
         const { providerConfig, fetchIdentity, callbackUrl, appOrigin } = await import("@/lib/auth/oauth.server");
-        const { upsertOAuthUser, createSession, sessionCookie, userFromToken } = await import("@/lib/auth/auth.server");
+        const { upsertOAuthUser, createSession, sessionCookie, userFromToken } = await import("@security/session.server");
         const origin = appOrigin(request);
         const fail = (msg: string) => Response.redirect(`${origin}/auth/login?error=${encodeURIComponent(msg)}`, 302);
         const p = params.provider;

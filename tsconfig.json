@@ -1,4 +1,5 @@
 {
+  "exclude": ["real-time/worker/**"],
   "include": ["src/**/*.ts", "src/**/*.tsx", "security/**/*.ts", "real-time/**/*.ts", "shell/**/*.ts", "vite.config.ts", "eslint.config.js"],
   "compilerOptions": {
     "target": "ES2022",

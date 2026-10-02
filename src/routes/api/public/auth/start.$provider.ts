@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/public/auth/start/$provider")({
     handlers: {
       GET: async ({ request, params }) => {
         const { providerConfig, authorizeUrl, callbackUrl, appOrigin } = await import("@/lib/auth/oauth.server");
-        const { randomId } = await import("@/lib/auth/auth.server");
+        const { randomId } = await import("@security/session.server");
         const p = params.provider;
         if (p !== "google" && p !== "github") return new Response("Unknown provider", { status: 404 });
         const cfg = providerConfig(p);
