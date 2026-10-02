@@ -62,7 +62,6 @@ export function LibraryPage() {
         <DropdownMenuRadioGroup value={kind} onValueChange={(v) => setKind(v as Kind | "All")}>
           {(["All", "Web App", "Mobile App", "Landing Page", "Dashboard", "API"] as const).map((k) => <DropdownMenuRadioItem key={k} value={k}>{k}</DropdownMenuRadioItem>)}
         </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
   );
