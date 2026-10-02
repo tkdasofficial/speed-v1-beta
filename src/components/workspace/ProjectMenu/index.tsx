@@ -4,7 +4,7 @@ import { useState } from "react";
 import { projectSlug } from "@/lib/projects";
 import { Button } from "@/components/ui/button";
 
-const recent = ["WebsiteToApk", "Hyper Copilot", "Stellar Dashboard", "Pulse Commerce", "Nexus API"];
+const recent: string[] = [];
 
 export function ProjectMenu({ name, setName, onClose, onSettings }: { name: string; setName: (n: string) => void; onClose: () => void; onSettings: () => void }) {
   const navigate = useNavigate();

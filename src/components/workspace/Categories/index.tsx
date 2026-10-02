@@ -1,6 +1,10 @@
 import { ArrowDownToLine, ArrowUpFromLine, ChevronDown, ChevronLeft, ChevronRight, Code2, File, FileCode2, Folder, FolderGit2, Github, GitBranch, GitCommitHorizontal, MoreHorizontal, Search, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { changedFiles, fileContents, fileTree, type FileNode } from "@/lib/workspace-data";
+import type { ChangedFile, FileNode } from "@/lib/workspace-types";
+
+const changedFiles: ChangedFile[] = [];
+const fileContents: Record<string, string> = {};
+const fileTree: FileNode[] = [];
 
 export type Category = "git" | "code" | "files";
 const cats: { id: Category; label: string; icon: typeof Code2; desc: string }[] = [
@@ -86,8 +90,8 @@ function GitPanel() {
   return (
     <div className="mx-auto grid max-w-2xl gap-3 p-3">
       <div className="grid gap-2 rounded-[16px] border border-border bg-gradient-to-b from-card to-background p-4 transition hover:border-foreground/25">
-        <div className="flex items-center gap-2 text-[14px] font-semibold"><Github className="!h-4 !w-4" /> you/my-ai-project</div>
-        <div className="flex items-center gap-2 text-[13px] text-muted-foreground"><GitBranch className="!h-4 !w-4" /> main <ChevronDown className="!h-3.5 !w-3.5" /><span className="ml-auto">{pushed ? "Up to date" : committed ? "1 commit to push" : "Synced 2h ago"}</span></div>
+        <div className="flex items-center gap-2 text-[14px] font-semibold"><Github className="!h-4 !w-4" /> Repository</div>
+        <div className="flex items-center gap-2 text-[13px] text-muted-foreground"><GitBranch className="!h-4 !w-4" /> main <ChevronDown className="!h-3.5 !w-3.5" /><span className="ml-auto">{pushed ? "Up to date" : committed ? "1 commit to push" : "Up to date"}</span></div>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" className="flex h-8 items-center justify-center gap-1.5 rounded-[12px] border border-border text-[13px] font-medium"><ArrowDownToLine className="!h-4 !w-4" /> Pull</button>
           <button type="button" disabled={!committed || pushed} onClick={() => setPushed(true)} className="flex h-8 items-center justify-center gap-1.5 rounded-[12px] border border-border text-[13px] font-medium disabled:opacity-40"><ArrowUpFromLine className="!h-4 !w-4" /> Push</button>

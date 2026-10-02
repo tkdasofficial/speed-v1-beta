@@ -1,6 +1,6 @@
 import { BookOpen, Brain, ChevronUp, FilePen, FilePlus, FlaskConical, Image, Loader2, Play, ScanEye, Search, Wrench, X, type LucideIcon } from "lucide-react";
 import { useState } from "react";
-import type { ActionKind, AgentAction } from "@/lib/workspace-data";
+import type { ActionKind, AgentAction } from "@/lib/workspace-types";
 
 export const actionIcon: Record<ActionKind, LucideIcon> = {
   read: BookOpen, search: Search, edit: FilePen, create: FilePlus, run: Play, asset: Image,

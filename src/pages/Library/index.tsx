@@ -12,15 +12,6 @@ type Kind = "Web App" | "Mobile App" | "Landing Page" | "Dashboard" | "API" | "O
 type Project = { id: string; name: string; desc: string; kind: Kind; modified: number; status: "Live" | "Draft" | "Building" };
 const icons: Record<Kind, typeof AppWindow> = { "Web App": AppWindow, "Mobile App": Smartphone, "Landing Page": AppWindow, Dashboard: LayoutDashboard, API: Server, Other: Code2 };
 const H = 3600_000;
-const now = Date.now();
-const seed: Project[] = [
-  { id: "p1", name: "WebsiteToApk", desc: "Convert eSports PlayGround site to an Expo app", kind: "Mobile App", modified: now - 0.2 * H, status: "Building" },
-  { id: "p2", name: "Hyper Copilot", desc: "Agent workspace with task routing", kind: "Web App", modified: now - 3 * H, status: "Live" },
-  { id: "p3", name: "Stellar Dashboard", desc: "Revenue and cohort analytics", kind: "Dashboard", modified: now - 26 * H, status: "Live" },
-  { id: "p4", name: "Pulse Commerce", desc: "Storefront launch page", kind: "Landing Page", modified: now - 72 * H, status: "Draft" },
-  { id: "p5", name: "Nexus API", desc: "REST gateway with auth and rate limits", kind: "API", modified: now - 150 * H, status: "Live" },
-  { id: "p6", name: "Elite Veo", desc: "Video generation settings and profile", kind: "Web App", modified: now - 400 * H, status: "Draft" },
-];
 const ago = (t: number) => { const m = Math.round((Date.now() - t) / 60000); if (m < 60) return `${Math.max(m, 1)}m ago`; const h = Math.round(m / 60); if (h < 24) return `${h}h ago`; return `${Math.round(h / 24)}d ago`; };
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 type Sort = "recent" | "name";
@@ -38,7 +29,7 @@ export function LibraryPage() {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
 
-  const load = (fail = false) => { setPhase("loading"); setTimeout(() => { if (fail) return setPhase("error"); setItems((p) => (p.length ? p : seed)); setPhase("ready"); }, 600); };
+  const load = (fail = false) => { setPhase("loading"); setTimeout(() => { if (fail) return setPhase("error"); setPhase("ready"); }, 600); };
   useEffect(() => load(), []);
 
   const list = useMemo(() => {

@@ -47,15 +47,10 @@ import { projectSlug } from "@/lib/projects";
 import "@/style/Dashboard/index.css";
 
 
-const recent = ["Hyper Copilot", "Stellar Dashboard", "Pulse Commerce", "Nexus API"];
-const dashboardProjects = [
-  { name: "Hyper Copilot", kind: "Agent workspace", preview: "copilot" },
-  { name: "Stellar Dashboard", kind: "Analytics", preview: "analytics" },
-  { name: "Pulse Commerce", kind: "Storefront", preview: "store" },
-  { name: "Nexus API", kind: "Developer tools", preview: "developer" },
-] as const;
+type PreviewKind = "copilot" | "analytics" | "store" | "developer";
+const dashboardProjects: { name: string; kind: string; preview: PreviewKind }[] = [];
 
-function ProjectPreview({ type }: { type: (typeof dashboardProjects)[number]["preview"] }) {
+function ProjectPreview({ type }: { type: PreviewKind }) {
   return <span className={`project-thumb preview-${type}`} aria-hidden="true">
     <span className="preview-window">
       <span className="preview-top"><i /><i /><i /><em /></span>
@@ -82,7 +77,7 @@ export function EvoAgent() {
   const beginTask = () => {
     if (!prompt.trim()) return;
     setRunning(true);
-    openProject("WebsiteToApk");
+    openProject(prompt.trim().slice(0, 40));
   };
 
   return (
@@ -107,7 +102,7 @@ function Home({ openProject, openDrawer, prompt, setPrompt, beginTask }: { openP
 
         <div className="ap-glow ap-glow-home" aria-hidden="true" />
         <h1>What are we working<br /><span className="ap-muted">on today?</span></h1>
-        <section className="projects-section" aria-labelledby="projects-heading">
+        {dashboardProjects.length > 0 && <section className="projects-section" aria-labelledby="projects-heading">
           <div className="projects-head"><span id="projects-heading">Projects</span><button>Show all <ChevronRight /></button></div>
           <div className="project-scroll">
             {dashboardProjects.map((project) => (
@@ -117,7 +112,7 @@ function Home({ openProject, openDrawer, prompt, setPrompt, beginTask }: { openP
               </button>
             ))}
           </div>
-        </section>
+        </section>}
         <div className="idea-list">
           <button onClick={() => setPrompt("Turn my notes into slides")}><Presentation className="coral" /> Turn my notes into slides</button>
           <button onClick={() => setPrompt("Analyze a Google Sheet")}><FileSpreadsheet className="green" /> Analyze a Google Sheet</button>

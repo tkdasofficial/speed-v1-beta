@@ -1,6 +1,6 @@
 import { AlertTriangle, Check, Loader2, Smartphone, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { seedTasks, type Task } from "@/lib/workspace-data";
+import type { Task } from "@/lib/workspace-types";
 
 export function PreviewView({ hasPreview, projectName, path, reloadKey, onBack }: { hasPreview: boolean; projectName: string; path: string; reloadKey: number; onBack: () => void }) {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
@@ -18,29 +18,8 @@ export function PreviewView({ hasPreview, projectName, path, reloadKey, onBack }
       <div className="min-h-0 flex-1 overflow-y-auto">
         {state === "loading" && <div className="grid h-full place-items-center text-[13px] text-muted-foreground"><span className="flex items-center gap-2"><Loader2 className="!h-4 !w-4 animate-spin text-primary" /> Starting preview…</span></div>}
         {state === "error" && <Empty icon={AlertTriangle} tone="destructive" title="Preview failed to load" body="The app stopped responding. Reload, or ask the agent to fix it." action="Back to chat" onAction={onBack} />}
-        {state === "ready" && <MockApp path={path} name={projectName} />}
+        {state === "ready" && <Empty icon={Smartphone} title="Preview unavailable" body={`${projectName} has no running app at ${path} yet.`} action="Back to chat" onAction={onBack} />}
       </div>
-    </div>
-  );
-}
-
-function MockApp({ path, name }: { path: string; name: string }) {
-  return (
-    <div className="min-h-full w-full overflow-hidden bg-foreground text-background">
-      <div className="flex h-11 items-center justify-between bg-primary px-4 text-[14px] font-semibold text-primary-foreground">{name}<span className="text-[12px] opacity-80">{path}</span></div>
-      {path === "/login" ? (
-        <div className="grid gap-2 p-5">
-          <h3 className="m-0 text-[18px] font-bold">Sign in</h3>
-          <div className="h-10 rounded-[12px] border border-background/20" /><div className="h-10 rounded-[12px] border border-background/20" />
-          <div className="grid h-10 place-items-center rounded-[12px] bg-cta text-[14px] font-semibold text-cta-foreground">Continue</div>
-        </div>
-      ) : (
-        <div className="grid gap-3 p-5">
-          <h3 className="m-0 text-[18px] font-bold">{path === "/" ? "Welcome back" : "Dashboard"}</h3>
-          <div className="grid grid-cols-2 gap-2">{["Visitors", "Signups", "Revenue", "Uptime"].map((k, i) => <div key={k} className="rounded-[12px] border border-background/15 p-3"><small className="block text-[11px] opacity-60">{k}</small><b className="text-[16px]">{["1.2k", "86", "$940", "99.9%"][i]}</b></div>)}</div>
-          <div className="h-24 rounded-[12px] bg-background/5" />
-        </div>
-      )}
     </div>
   );
 }
@@ -103,7 +82,7 @@ function Empty({ icon: Icon, title, body, action, onAction, tone }: { icon: type
 }
 
 export function TasksSheet({ onClose }: { onClose: () => void }) {
-  const [tasks, setTasks] = useState<Task[]>(seedTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [draft, setDraft] = useState("");
   const move = (id: string, status: Task["status"] | null) => setTasks((t) => (status ? t.map((x) => (x.id === id ? { ...x, status, progress: status === "active" ? 10 : undefined } : x)) : t.filter((x) => x.id !== id)));
   const groups: { key: Task["status"]; label: string; empty: string }[] = [
