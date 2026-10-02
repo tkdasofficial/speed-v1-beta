@@ -1,26 +1,32 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AuthHeader } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-
+import { requestPasswordReset } from "@/lib/auth/auth.functions";
 
 const emailSchema = z.string().trim().email("Enter a valid email").max(255);
 
 export function ForgotPasswordPage() {
+  const request = useServerFn(requestPasswordReset);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     const r = emailSchema.safeParse(email);
     if (!r.success) return setError(r.error.issues[0]?.message ?? "Enter a valid email");
     setBusy(true);
-    setTimeout(() => { setBusy(false); setSent(true); }, 700);
+    try {
+      await request({ data: { email: r.data } });
+      setSent(true);
+    } catch { setError("Something went wrong. Try again."); }
+    setBusy(false);
   };
 
   return (
