@@ -2,8 +2,8 @@
 .au-shell { height: 100dvh; overflow-y: auto; display: grid; background: var(--background); color: var(--foreground); font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
 .au-shell a { text-decoration: none; }
 .au-shell svg { flex: none; }
-.au-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; letter-spacing: .16em; color: var(--foreground) !important; }
-.au-brand .app-icon { width: 26px; height: 26px; }
+.au-brand { display: inline-flex; align-items: center; color: var(--foreground) !important; }
+.au-brand .app-icon { width: 42px; height: 42px; }
 
 /* Showcase panel (desktop) */
 .au-aside { display: none; position: relative; overflow: hidden; flex-direction: column; justify-content: space-between; padding: 32px 40px; border-right: 1px solid var(--border); background: linear-gradient(180deg, var(--card), var(--background)); }
@@ -27,7 +27,7 @@
 .au-main { position: relative; min-height: 100dvh; display: flex; flex-direction: column; padding: max(16px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); overflow: hidden; }
 .au-main > :not(.au-main-glow) { position: relative; z-index: 1; }
 .au-main-glow { position: absolute; top: -160px; left: 50%; width: 560px; height: 420px; transform: translateX(-50%); pointer-events: none; background: radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 70%); filter: blur(10px); }
-.au-top { height: 40px; display: flex; align-items: center; }
+.au-top { min-height: 48px; display: flex; align-items: center; }
 .au-panel { flex: 1; width: 100%; max-width: 400px; margin: 0 auto; padding: 36px 0 24px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
 .au-legal { margin: 0; text-align: center; font-size: 12px; color: var(--muted-foreground); }
 .au-legal a { color: var(--muted-foreground); }

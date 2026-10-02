@@ -15,7 +15,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
     <main className="au-shell">
       <aside className="au-aside" aria-hidden="true">
         <div className="au-aside-glow" />
-        <Link to="/" className="au-brand"><AppIcon />SPEED</Link>
+        <Link to="/" className="au-brand" aria-label="Speed home"><AppIcon /></Link>
         <div className="au-aside-body">
           <span className="au-badge"><i />Agent is online</span>
           <h2 className="au-aside-title">Build apps at the<br /><span>speed of thought.</span></h2>
@@ -29,7 +29,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
       </aside>
       <section className="au-main">
         <div className="au-main-glow" />
-        <div className="au-top"><Link to="/" className="au-brand"><AppIcon />SPEED</Link></div>
+        <div className="au-top"><Link to="/" className="au-brand" aria-label="Speed home"><AppIcon /></Link></div>
         <div className="au-panel">{children}</div>
         <p className="au-legal">© Speed · <Link to="/terms-service">Terms</Link> · <Link to="/privacy-policy">Privacy</Link></p>
       </section>
