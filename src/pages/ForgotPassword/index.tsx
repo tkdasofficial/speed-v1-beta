@@ -1,3 +1,4 @@
+import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
@@ -23,8 +24,7 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <main className="auth-page">
-      <div className="auth-card">
+    <AuthShell>
         <AuthHeader title="Reset password" sub="We'll email you a link to set a new password." />
         {sent ? (
           <div className="sp-state">
@@ -40,7 +40,6 @@ export function ForgotPasswordPage() {
           </form>
         )}
         <p className="auth-foot">Remembered it? <Link to="/auth/login">Log in</Link></p>
-      </div>
-    </main>
+      </AuthShell>
   );
 }
