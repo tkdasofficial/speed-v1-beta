@@ -27,6 +27,7 @@ export class RealtimeClient {
   constructor(private seq: number, private o: Options) {}
 
   get lastSeq() { return this.seq; }
+  setSeq(s: number) { this.seq = s; }
 
   start() {
     this.stopped = false;

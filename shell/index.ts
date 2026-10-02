@@ -80,7 +80,7 @@ export function bootShell(qc: QueryClient, userId: string): Promise<void> {
     } else {
       seq = await fullSync();
     }
-    (rt as unknown as { seq: number }).seq = seq;
+    rt.setSeq(seq);
     rt.start(); // on open it fetches any deltas since `seq`
   })();
 

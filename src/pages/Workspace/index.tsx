@@ -17,7 +17,7 @@ import "@/style/Workspace/index.css";
 type Mode = "chat" | "preview" | "settings";
 
 export function Workspace() {
-  const { projectId } = useParams({ from: "/project/$projectId" });
+  const { projectId } = useParams({ from: "/_authenticated/project/$projectId" });
   return <WorkspaceInner key={projectId} projectId={projectId} />;
 }
 

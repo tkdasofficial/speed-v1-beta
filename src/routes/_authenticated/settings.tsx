@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SettingsPage } from "@/pages/Settings";
 
-export const Route = createFileRoute("/settings")({
+export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [
     { title: "Settings — Speed Agent" },
     { name: "description", content: "Account and policy links for Speed Agent." },
