@@ -27,16 +27,22 @@ export function PreviewView({ hasPreview, projectName, path, reloadKey, onBack }
   );
 }
 
-export function SettingsView({ name, setName }: { name: string; setName: (n: string) => void }) {
-  const [model, setModel] = useState("Free");
-  const [autoCheck, setAutoCheck] = useState(true);
-  const [plan, setPlan] = useState(false);
-  const [vis, setVis] = useState("Private");
+export function SettingsView({ name, setName, settings, onSettings }: { name: string; setName: (n: string) => void; settings: Record<string, unknown>; onSettings: (s: Record<string, string | boolean>) => void }) {
+  const [draftName, setDraftName] = useState(name);
+  useEffect(() => setDraftName(name), [name]);
+  const model = typeof settings["model"] === "string" ? (settings["model"] as string) : "Free";
+  const autoCheck = typeof settings["autoCheck"] === "boolean" ? (settings["autoCheck"] as boolean) : true;
+  const plan = settings["planMode"] === true;
+  const vis = typeof settings["visibility"] === "string" ? (settings["visibility"] as string) : "Private";
+  const setModel = (v: string) => onSettings({ model: v });
+  const setAutoCheck = (v: boolean) => onSettings({ autoCheck: v });
+  const setPlan = (v: boolean) => onSettings({ planMode: v });
+  const setVis = (v: string) => onSettings({ visibility: v });
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto grid max-w-2xl gap-5 p-4">
         <Section title="Project">
-          <label className="grid gap-1 text-[12px] text-muted-foreground">Name<input value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] text-foreground outline-none focus:border-primary" /></label>
+          <label className="grid gap-1 text-[12px] text-muted-foreground">Name<input value={draftName} onChange={(e) => setDraftName(e.target.value)} onBlur={() => { if (draftName.trim() && draftName !== name) setName(draftName); }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} className="h-10 rounded-[14px] border border-border bg-gradient-to-b from-card to-background px-3 text-[14px] text-foreground outline-none focus:border-primary" /></label>
           <Seg label="Visibility" value={vis} options={["Private", "Public"]} onChange={setVis} />
         </Section>
         <Section title="Model">
