@@ -217,6 +217,9 @@
 .speed-sidebar-backdrop { position: fixed; inset: 0; z-index: 60; background: color-mix(in oklab, var(--background) 72%, transparent); backdrop-filter: blur(6px); animation: speed-fade .2s ease both; }
 .speed-sidebar--mobile { width: min(88vw, 330px); min-width: 0; border-right-color: color-mix(in oklab, var(--primary) 22%, var(--border)); box-shadow: 22px 0 80px color-mix(in oklab, var(--background) 86%, transparent); animation: speed-slide .24s cubic-bezier(.22,.8,.25,1) both; }
 
+.speed-workspace-shell { width: 100%; height: 100dvh; display: flex; overflow: hidden; background: var(--background); }
+.speed-workspace-main { min-width: 0; flex: 1; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
 @keyframes speed-fade { from { opacity: 0; } }
 @keyframes speed-slide { from { transform: translateX(-24px); opacity: .75; } }
 
@@ -232,6 +235,7 @@
   .speed-sidebar__utility { height: 40px; font-size: 13px; }
   .speed-sidebar__section-head { margin-top: 7px; }
   .speed-sidebar__account { height: 50px; }
+  .speed-sidebar__menu.is-project { position: fixed; left: min(calc(88vw - 148px), 172px); right: auto; top: 50%; width: 138px; transform: translateY(-50%); }
 }
 
 @media (min-width: 761px) {

@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, ListChecks, MoreHorizontal, PanelLeft, RotateCw, Shapes } from "lucide-react";
 import { useState } from "react";
-import { AppDrawer } from "@/components/AppDrawer";
+import { AppDrawer, DesktopSidebar } from "@/components/AppDrawer";
 import { Header, HeaderIcon } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -33,10 +33,13 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
   const [previewPath, setPreviewPath] = useState("/");
   const [previewReload, setPreviewReload] = useState(0);
   const hasPreview = items.some((i) => i.type === "checkpoint");
+  const openProject = (projectName: string) => void navigate({ to: "/project/$projectId", params: { projectId: projectSlug(projectName) } });
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden bg-background text-foreground">
-      <AppDrawer open={drawer} onClose={() => setDrawer(false)} onNew={() => void navigate({ to: "/dashboard" })} onOpenProject={(p) => { setDrawer(false); if (p) void navigate({ to: "/project/$projectId", params: { projectId: projectSlug(p) } }); }} />
+    <div className="speed-workspace-shell text-foreground">
+      <DesktopSidebar onNew={() => void navigate({ to: "/dashboard" })} onOpenProject={openProject} />
+      <div className="speed-workspace-main">
+      <AppDrawer open={drawer} onClose={() => setDrawer(false)} onNew={() => void navigate({ to: "/dashboard" })} onOpenProject={openProject} />
       <Header
         left={<HeaderIcon label="Open navigation" onClick={() => setDrawer(true)}><PanelLeft /></HeaderIcon>}
         title={name}
@@ -76,6 +79,7 @@ function WorkspaceInner({ projectId }: { projectId: string }) {
        {menu && <ProjectMenu name={name} setName={setName} onClose={() => setMenu(false)} onSettings={() => { setMenu(false); setMode("settings"); }} />}
        {tools && <Categories onClose={() => setTools(false)} />}
       {tasks && <TasksSheet onClose={() => setTasks(false)} />}
+      </div>
     </div>
   );
 }

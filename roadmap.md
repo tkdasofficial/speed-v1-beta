@@ -7,4 +7,4 @@
 - [x] Remove duplicate page labels and status tags; enlarge auth branding icon
 - [x] Split app-page styles into owner-specific files and compact auth spacing
 
-- [ ] Upgrade desktop sidebar and mobile AppDrawer to match the app-wide UI quality
+- [x] Upgrade desktop sidebar and mobile AppDrawer to match the app-wide UI quality
