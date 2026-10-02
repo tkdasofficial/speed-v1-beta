@@ -7,6 +7,11 @@ export class GithubError extends Error {
 }
 
 export async function gh<T>(userId: string, path: string): Promise<T> {
+  return (await (await ghRaw(userId, path)).json()) as T;
+}
+
+/** Authenticated GitHub request returning the raw (ok) Response — used for archive downloads. */
+export async function ghRaw(userId: string, path: string): Promise<Response> {
   let token: string;
   try { token = await getGithubAccessToken(userId); }
   catch (e) { if (e instanceof GithubReconnectRequired) throw new GithubError("reconnect", e.message); throw e; }
@@ -16,7 +21,7 @@ export async function gh<T>(userId: string, path: string): Promise<T> {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "speed-agent", "X-GitHub-Api-Version": "2022-11-28" },
     });
   } catch { throw new GithubError("github", "GitHub is unreachable, try again"); }
-  if (res.ok) return (await res.json()) as T;
+  if (res.ok) return res;
   if (res.status === 401) {
     await d1("UPDATE github_connections SET status = 'reconnect_required', updated_at = datetime('now') WHERE user_id = ?", [userId]);
     throw new GithubError("reconnect", "GitHub access was revoked — please reconnect GitHub");
