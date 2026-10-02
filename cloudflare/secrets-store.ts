@@ -2,7 +2,7 @@
 // Usage: bun cloudflare/secrets-store.ts   — values are read from the environment and never printed.
 // Needs a token with "Secrets Store: Edit" permission.
 export const STORE_NAME = "speed";
-export const STORE_SECRETS = ["SMTP_EMAIL", "SMTP_PASSWORD", "REALTIME_SECRET", "AUTH_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "STRIPE_WEBHOOK_SECRET"];
+export const STORE_SECRETS = ["SMTP_EMAIL", "SMTP_PASSWORD", "REALTIME_SECRET", "AUTH_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "GITLAB_CLIENT_ID", "GITLAB_CLIENT_SECRET", "BITBUCKET_CLIENT_ID", "BITBUCKET_CLIENT_SECRET", "STRIPE_WEBHOOK_SECRET"];
 
 const env = process.env;
 const API = `https://api.cloudflare.com/client/v4/accounts/${env["CLOUDFLARE_ACCOUNT_ID"]}/secrets_store/stores`;
