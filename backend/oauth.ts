@@ -1,10 +1,8 @@
 import { envStr } from "./context";
 export type Provider = "google" | "github";
 
-export function appOrigin(request: Request) {
-  return envStr("APP_URL")?.replace(/\/$/, "") || new URL(request.url).origin;
-}
-export const callbackUrl = (request: Request, p: Provider) => `${appOrigin(request)}/api/public/auth/callback/${p}`;
+// The OAuth callback always lives on the API Worker itself, independent of the frontend host.
+export const callbackUrl = (request: Request, p: Provider) => `${new URL(request.url).origin}/auth/callback/${p}`;
 
 export function providerConfig(p: Provider) {
   const id = envStr(p === "google" ? "GOOGLE_CLIENT_ID" : "GITHUB_CLIENT_ID");
