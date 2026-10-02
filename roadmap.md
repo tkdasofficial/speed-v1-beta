@@ -8,3 +8,4 @@
 - [x] Split app-page styles into owner-specific files and compact auth spacing
 
 - [x] Upgrade desktop sidebar and mobile AppDrawer to match the app-wide UI quality
+- [x] Compact the AppDrawer, consolidate account options, simplify active navigation, and restore Preview text contrast
