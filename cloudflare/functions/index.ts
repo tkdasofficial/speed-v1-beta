@@ -125,8 +125,21 @@ async function route(req: Request, env: Env): Promise<Response> {
   return json({ error: "Not found" }, 404, h);
 }
 
+// Cloudflare Secrets Store bindings expose `get()`; resolve them once per request
+// so the rest of the code reads plain strings via envStr().
+async function resolveSecrets(env: Env): Promise<Env> {
+  const out: Env = { ...env };
+  await Promise.all(Object.entries(env).map(async ([k, v]) => {
+    if (v && typeof v === "object" && typeof (v as { get?: unknown }).get === "function" && k !== "DB") {
+      try { out[k] = await (v as { get(): Promise<string> }).get(); } catch { out[k] = undefined; }
+    }
+  }));
+  return out;
+}
+
 export default {
-  fetch(req: Request, env: Env) {
-    return als.run({ req, env }, () => route(req, env));
+  async fetch(req: Request, env: Env) {
+    const e = await resolveSecrets(env);
+    return als.run({ req, env: e }, () => route(req, e));
   },
 };
