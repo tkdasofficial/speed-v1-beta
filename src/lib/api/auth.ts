@@ -20,3 +20,4 @@ export const saveProfile = endpoint<typeof A.saveProfile>("saveProfile");
 export const signOut = async () => {
   try { return await endpoint<typeof A.signOut>("signOut")(); } finally { setToken(null); }
 };
+export const getGithubConnection = endpoint<typeof A.getGithubConnection>("getGithubConnection");
