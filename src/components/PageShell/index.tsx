@@ -26,8 +26,10 @@ export function PageShell({ title, sub, search, onSearch, actions, children }: {
         ) : undefined}
         right={<>{onSearch && !open && <HeaderIcon label="Search" onClick={() => setOpen(true)}><Search /></HeaderIcon>}{actions}</>}
       />
-      <div className="ap-hero"><div className="ap-glow" aria-hidden="true" /><h1>{title}</h1>{sub && <p>{sub}</p>}</div>
-      <div className="sp-body">{children}</div>
+      <div className="sp-body">
+        <div className="ap-hero"><div className="ap-glow" aria-hidden="true" /><h1>{title}</h1>{sub && <p>{sub}</p>}</div>
+        {children}
+      </div>
     </main>
   );
 }
