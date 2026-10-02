@@ -626,48 +626,7 @@ export type Database = {
       }
     }
     Views: {
-      secret_metadata: {
-        Row: {
-          created_at: string | null
-          id: string | null
-          name: string | null
-          project_id: string | null
-          project_integration_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string | null
-          name?: string | null
-          project_id?: string | null
-          project_integration_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string | null
-          name?: string | null
-          project_id?: string | null
-          project_integration_id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "secrets_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "secrets_project_integration_id_fkey"
-            columns: ["project_integration_id"]
-            isOneToOne: false
-            referencedRelation: "project_integrations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       owns_project: { Args: { _project_id: string }; Returns: boolean }
