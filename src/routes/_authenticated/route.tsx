@@ -7,7 +7,10 @@ import { bootShell } from "@shell/index";
 // any protected route code, loader or data runs. Unauthenticated → /auth/login.
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ context, location }) => {
-    const me = await context.queryClient.fetchQuery({ queryKey: ["me"], queryFn: () => getMe(), staleTime: 60_000 });
+    // Only a positive result is cached client-side; the server re-validates every protected call anyway.
+    const cached = context.queryClient.getQueryData<Awaited<ReturnType<typeof getMe>>>(["me"]);
+    const me = cached ?? (await getMe());
+    if (me) context.queryClient.setQueryData(["me"], me);
     if (!me) throw redirect({ to: "/auth/login", search: { redirect: location.href } as never });
     return { me };
   },

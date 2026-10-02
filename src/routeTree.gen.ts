@@ -26,6 +26,7 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-pas
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthenticatedProjectProjectIdRouteImport } from './routes/_authenticated/project.$projectId'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as ApiPublicAuthCallbackProviderRouteImport } from './routes/api/public/auth/callback.$provider'
 import { Route as ApiPublicAuthStartProviderRouteImport } from './routes/api/public/auth/start.$provider'
 
@@ -116,6 +117,11 @@ const AuthenticatedProjectProjectIdRoute =
     path: '/project/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe/webhook',
+  path: '/api/public/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAuthCallbackProviderRoute =
   ApiPublicAuthCallbackProviderRouteImport.update({
     id: '/api/public/auth/callback/$provider',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
   '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
   '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/_authenticated/project/$projectId': typeof AuthenticatedProjectProjectIdRoute
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
   '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/project/$projectId'
+    | '/api/public/stripe/webhook'
     | '/api/public/auth/callback/$provider'
     | '/api/public/auth/start/$provider'
   fileRoutesByTo: FileRoutesByTo
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/project/$projectId'
+    | '/api/public/stripe/webhook'
     | '/api/public/auth/callback/$provider'
     | '/api/public/auth/start/$provider'
   id:
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/_authenticated/project/$projectId'
+    | '/api/public/stripe/webhook'
     | '/api/public/auth/callback/$provider'
     | '/api/public/auth/start/$provider'
   fileRoutesById: FileRoutesById
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicAuthCallbackProviderRoute: typeof ApiPublicAuthCallbackProviderRoute
   ApiPublicAuthStartProviderRoute: typeof ApiPublicAuthStartProviderRoute
 }
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/stripe/webhook': {
+      id: '/api/public/stripe/webhook'
+      path: '/api/public/stripe/webhook'
+      fullPath: '/api/public/stripe/webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/auth/callback/$provider': {
       id: '/api/public/auth/callback/$provider'
       path: '/api/public/auth/callback/$provider'
@@ -442,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicAuthCallbackProviderRoute: ApiPublicAuthCallbackProviderRoute,
   ApiPublicAuthStartProviderRoute: ApiPublicAuthStartProviderRoute,
 }
