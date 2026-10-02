@@ -25,6 +25,8 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-pas
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as ProjectProjectIdRouteImport } from './routes/project.$projectId'
+import { Route as ApiPublicAuthCallbackProviderRouteImport } from './routes/api/public/auth/callback.$provider'
+import { Route as ApiPublicAuthStartProviderRouteImport } from './routes/api/public/auth/start.$provider'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -106,6 +108,18 @@ const ProjectProjectIdRoute = ProjectProjectIdRouteImport.update({
   path: '/project/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAuthCallbackProviderRoute =
+  ApiPublicAuthCallbackProviderRouteImport.update({
+    id: '/api/public/auth/callback/$provider',
+    path: '/api/public/auth/callback/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAuthStartProviderRoute =
+  ApiPublicAuthStartProviderRouteImport.update({
+    id: '/api/public/auth/start/$provider',
+    path: '/api/public/auth/start/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,6 +138,8 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
+  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,6 +158,8 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
+  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +179,8 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/api/public/auth/callback/$provider': typeof ApiPublicAuthCallbackProviderRoute
+  '/api/public/auth/start/$provider': typeof ApiPublicAuthStartProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +201,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/project/$projectId'
+    | '/api/public/auth/callback/$provider'
+    | '/api/public/auth/start/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,6 +221,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/project/$projectId'
+    | '/api/public/auth/callback/$provider'
+    | '/api/public/auth/start/$provider'
   id:
     | '__root__'
     | '/'
@@ -217,6 +241,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/project/$projectId'
+    | '/api/public/auth/callback/$provider'
+    | '/api/public/auth/start/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,6 +262,8 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ProjectProjectIdRoute: typeof ProjectProjectIdRoute
+  ApiPublicAuthCallbackProviderRoute: typeof ApiPublicAuthCallbackProviderRoute
+  ApiPublicAuthStartProviderRoute: typeof ApiPublicAuthStartProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -352,6 +380,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth/callback/$provider': {
+      id: '/api/public/auth/callback/$provider'
+      path: '/api/public/auth/callback/$provider'
+      fullPath: '/api/public/auth/callback/$provider'
+      preLoaderRoute: typeof ApiPublicAuthCallbackProviderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/auth/start/$provider': {
+      id: '/api/public/auth/start/$provider'
+      path: '/api/public/auth/start/$provider'
+      fullPath: '/api/public/auth/start/$provider'
+      preLoaderRoute: typeof ApiPublicAuthStartProviderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -372,6 +414,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   ProjectProjectIdRoute: ProjectProjectIdRoute,
+  ApiPublicAuthCallbackProviderRoute: ApiPublicAuthCallbackProviderRoute,
+  ApiPublicAuthStartProviderRoute: ApiPublicAuthStartProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

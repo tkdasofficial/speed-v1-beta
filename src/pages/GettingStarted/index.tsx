@@ -1,10 +1,11 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AuthHeader } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-
+import { saveProfile } from "@/lib/auth/auth.functions";
 
 const schema = z.object({
   fullName: z.string().trim().min(1, "Enter your full name").max(100),
@@ -14,17 +15,25 @@ const schema = z.object({
 
 export function GettingStartedPage() {
   const navigate = useNavigate();
+  const save = useServerFn(saveProfile);
   const [form, setForm] = useState({ fullName: "", role: "", teamType: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const submit = (event: React.FormEvent) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
     const result = schema.safeParse(form);
     if (!result.success) return setError(result.error.issues[0]?.message ?? "Check your details");
     setBusy(true);
-    setTimeout(() => navigate({ to: "/dashboard" }), 600);
+    try {
+      const res = await save({ data: result.data });
+      if (!res.ok) { setBusy(false); return setError(res.error); }
+      navigate({ to: "/dashboard" });
+    } catch {
+      setBusy(false);
+      setError("Something went wrong. Try again.");
+    }
   };
 
   return <AuthShell>

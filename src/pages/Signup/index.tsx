@@ -1,10 +1,11 @@
 import { AuthShell } from "@/components/AuthShell";
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { AuthHeader, SocialButtons } from "@/components/AuthParts";
+import { AuthHeader, SocialButtons, startOAuth } from "@/components/AuthParts";
 import { Button } from "@/components/ui/button";
-
+import { signUp } from "@/lib/auth/auth.functions";
 
 const schema = z.object({
   email: z.string().trim().email("Enter a valid email").max(255),
@@ -13,6 +14,7 @@ const schema = z.object({
 
 export function SignupPage() {
   const navigate = useNavigate();
+  const doSignUp = useServerFn(signUp);
   const [form, setForm] = useState({ email: "", password: "" });
   const [terms, setTerms] = useState(false);
   const [privacy, setPrivacy] = useState(false);
@@ -24,20 +26,28 @@ export function SignupPage() {
     setError("Accept the Terms of Service and Privacy Policy");
     return false;
   };
-  const finish = () => { setBusy(true); setTimeout(() => navigate({ to: "/getting-started" }), 700); };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     const r = schema.safeParse(form);
     if (!r.success) return setError(r.error.issues[0]?.message ?? "Check your details");
-    if (agreed()) finish();
+    if (!agreed()) return;
+    setBusy(true);
+    try {
+      const res = await doSignUp({ data: r.data });
+      if (!res.ok) { setBusy(false); return setError(res.error); }
+      navigate({ to: "/getting-started" });
+    } catch {
+      setBusy(false);
+      setError("Something went wrong. Try again.");
+    }
   };
 
   return (
     <AuthShell>
         <AuthHeader title="Create account" sub="Start building apps with Speed." />
-        <SocialButtons disabled={busy} onPick={() => { setError(""); if (agreed()) finish(); }} />
+        <SocialButtons disabled={busy} onPick={(p) => { setError(""); if (agreed()) { setBusy(true); startOAuth(p); } }} />
         <form onSubmit={submit} className="auth-form" noValidate>
           <label>Email<input className="sp-input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" maxLength={255} /></label>
           <label>Password<input className="sp-input" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" maxLength={72} /></label>
