@@ -47,7 +47,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com" || url.hostname.endsWith("lovable.app") === false && req.destination === "font") {
+  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
     e.respondWith(caches.open(ASSETS).then(async (c) => (await c.match(req)) || fetch(req).then((r) => { if (r.ok) c.put(req, r.clone()); return r; })));
   }
 });
